@@ -1,6 +1,10 @@
 # simple-drawing-board.js
 Just simple minimal canvas drawing lib.
 
+- under 500 lines of codes
+- minimal functions for drawing
+- no dependencies
+
 > You have to make your UIs by your own.
 
 [DEMO](http://labs.lealog.net/sdb)
