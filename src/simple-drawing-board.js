@@ -1,7 +1,6 @@
 /**
  * TODO:
  * - 色のバリデーション
- * - 透明で消す
  * - 履歴まわり
  *
  * - コメント
@@ -58,10 +57,24 @@ SimpleDrawingBoard.prototype = {
     _getMidInputCoords: _getMidInputCoords
 };
 
+/**
+ * 線の太さを設定する
+ *
+ * @param {Number} size
+ *     太さ(1以下は全て1とする)
+ *
+ */
 function setLineSize(size) {
     this.ctx.lineWidth = (size|0) || 1;
     return this;
 }
+/**
+ * 線の色を設定する
+ *
+ * @param {String} color
+ *     色(TODO)
+ *
+ */
 function setLineColor(color) {
     // TODO: validation
     this.ctx.strokeStyle = color;
@@ -80,18 +93,18 @@ function clear() {
 }
 function setMode(mode) {
     var settings = this._settings;
-
     if (mode === 'DRAW') {
         this.setLineColor(settings.lineColor);
-        // TODO: transparentな時はコレにしないとダメ？
-        // this.ctx.globalCompositeOperation = 'source-over';
+        if (settings.isTransparent) {
+            this.ctx.globalCompositeOperation = 'source-over';
+        }
     }
     else {
         this.setLineColor(settings.boardColor);
-        // TODO: transparentな時はコレにしないとダメ？
-        // this.ctx.globalCompositeOperation = 'destination-out';
+        if (settings.isTransparent) {
+            this.ctx.globalCompositeOperation = 'destination-out';
+        }
     }
-    this._settings.mode = mode;
     return this;
 }
 function getImg() {
@@ -115,6 +128,11 @@ function _initBoard(options) {
         for (var p in options) {
             settings[p] = options[p];
         }
+    }
+
+    if (settings.boardColor === 'transparent') {
+        settings.boardColor    = 'rgba(0,0,0,1)';
+        settings.isTransparent = 1;
     }
 
     this.ctx.lineCap = this.ctx.lineJoin = 'round';

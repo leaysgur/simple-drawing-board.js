@@ -9,9 +9,9 @@ global.SimpleDrawingBoard.util = {
     Eve: Eve,
     Const: {
         settings: {
-            lineColor:  '#000',
-            lineSize:   1,
-            boardColor: '#eee'
+            lineColor:  '#aaa',
+            lineSize:   5,
+            boardColor: 'transparent'
         }
     }
 };

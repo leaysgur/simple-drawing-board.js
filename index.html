@@ -12,9 +12,13 @@
 var el = document.getElementById('canvas');
 var sdb = new SimpleDrawingBoard(el, {
     lineColor:  '#00f',
-    lineSize:   10,
-    boardColor: '#fff'
+    lineSize:   50,
+    // boardColor: '#fff'
+    boardColor: 'transparent'
 });
+
+sdb.fill('#00f');
+sdb.setMode('ERASE');
 </script>
 </body>
 </html>
