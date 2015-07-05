@@ -1,8 +1,3 @@
-/**
- * TODO:
- * - モバイル
- *
- */
 ;(function(global, undefined) {
 'use strict';
 
@@ -208,10 +203,18 @@ function redo() {
  *
  */
 function dispose() {
-    this.el.removeEventListener('mousedown', this, false);
-    this.el.removeEventListener('mousemove', this, false);
-    this.el.removeEventListener('mouseup',   this, false);
-    this.el.removeEventListener('mouseout',  this, false);
+    if (SimpleDrawingBoard.util.isTouch) {
+        this.el.removeEventListener('touchstart',   this, false);
+        this.el.removeEventListener('touchmove',    this, false);
+        this.el.removeEventListener('touchend',     this, false);
+        this.el.removeEventListener('touchcancel',  this, false);
+        this.el.removeEventListener('gesturestart', this, false);
+    } else {
+        this.el.removeEventListener('mousedown', this, false);
+        this.el.removeEventListener('mousemove', this, false);
+        this.el.removeEventListener('mouseup',   this, false);
+        this.el.removeEventListener('mouseout',  this, false);
+    }
 
     SimpleDrawingBoard.util.cAF(this._timer);
     this._timer = null;
@@ -271,10 +274,18 @@ function _initBoard(options) {
  *
  */
 function _initEvents() {
-    this.el.addEventListener('mousedown', this, false);
-    this.el.addEventListener('mousemove', this, false);
-    this.el.addEventListener('mouseup',   this, false);
-    this.el.addEventListener('mouseout',  this, false);
+    if (SimpleDrawingBoard.util.isTouch) {
+        this.el.addEventListener('touchstart',   this, false);
+        this.el.addEventListener('touchmove',    this, false);
+        this.el.addEventListener('touchend',     this, false);
+        this.el.addEventListener('touchcancel',  this, false);
+        this.el.addEventListener('gesturestart', this, false);
+    } else {
+        this.el.addEventListener('mousedown', this, false);
+        this.el.addEventListener('mousemove', this, false);
+        this.el.addEventListener('mouseup',   this, false);
+        this.el.addEventListener('mouseout',  this, false);
+    }
 }
 /**
  * 実際の描画処理
@@ -282,16 +293,16 @@ function _initEvents() {
  *
  */
 function _draw() {
-    var currentMid = this._getMidInputCoords(this._coords.current);
+    if (this._isDrawing) {
+        var currentMid = this._getMidInputCoords(this._coords.current);
+        this.ctx.beginPath();
+        this.ctx.moveTo(currentMid.x, currentMid.y);
+        this.ctx.quadraticCurveTo(this._coords.old.x, this._coords.old.y, this._coords.oldMid.x, this._coords.oldMid.y);
+        this.ctx.stroke();
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(currentMid.x, currentMid.y);
-    this.ctx.quadraticCurveTo(this._coords.old.x, this._coords.old.y, this._coords.oldMid.x, this._coords.oldMid.y);
-
-    this._isDrawing && this.ctx.stroke();
-
-    this._coords.old    = this._coords.current;
-    this._coords.oldMid = currentMid;
+        this._coords.old    = this._coords.current;
+        this._coords.oldMid = currentMid;
+    }
 
     this._timer = SimpleDrawingBoard.util.rAF(this._draw.bind(this));
 }
@@ -299,8 +310,12 @@ function _draw() {
  * 描画しはじめの処理
  *
  */
-function _onInputDown() {
+function _onInputDown(ev) {
     this._isDrawing = 1;
+
+    var coords = this._getInputCoords(ev);
+    this._coords.current = this._coords.old = coords;
+    this._coords.oldMid  = this._getMidInputCoords(coords);
 }
 /**
  * 描画してる間の処理
@@ -315,6 +330,7 @@ function _onInputMove(ev) {
  */
 function _onInputUp() {
     this._isDrawing = 0;
+
     this._saveHistory();
 }
 /**
@@ -330,13 +346,18 @@ function _handleEvent(ev) {
 
     switch (ev.type) {
     case 'mousedown':
-        this._onInputDown();
+    case 'touchstart':
+        this._onInputDown(ev);
         break;
     case 'mousemove':
+    case 'touchmove':
         this._onInputMove(ev);
         break;
     case 'mouseup':
     case 'mouseout':
+    case 'touchend':
+    case 'touchcancel':
+    case 'gesturestart':
         this._onInputUp();
         break;
     }
@@ -401,7 +422,6 @@ function _saveHistory() {
     var lastImg = history.values[history.values.length-1];
     if (lastImg && curImg === lastImg) { return; }
 
-    // TODO: from options
     // 履歴には限度がある
     while (history.values.length >= this._settings.historyDepth) {
         history.values.shift();

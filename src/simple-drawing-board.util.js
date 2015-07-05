@@ -6,6 +6,7 @@ if (!global.SimpleDrawingBoard) {
 }
 
 global.SimpleDrawingBoard.util = {
+    isTouch:       (isTouch()),
     isTransparent: isTransparent,
     rAF: (rAF()),
     cAF: (cAF()),
@@ -19,6 +20,16 @@ global.SimpleDrawingBoard.util = {
         }
     }
 };
+
+/**
+ * touchデバイス or NOT
+ *
+ * @return {Boolean}
+ *     isTouchデバイス
+ */
+function isTouch() {
+    return 'ontouchstart' in global.document;
+}
 
 /**
  * 透過の背景の場合、消すモードの処理が微妙に変わるので、
