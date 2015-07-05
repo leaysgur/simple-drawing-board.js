@@ -5,7 +5,16 @@
   <title></title>
 </head>
 <body style="background-color: #eee;">
-  <canvas id="canvas" width="500" height="300"></canvas>
-  <script src="./src/main.js"></script>
+<canvas id="canvas" width="500" height="300"></canvas>
+<script src="./src/simple-drawing-board.js"></script>
+<script src="./src/simple-drawing-board.util.js"></script>
+<script>
+var el = document.getElementById('canvas');
+var sdb = new SimpleDrawingBoard(el, {
+    lineColor:  '#00f',
+    lineSize:   10,
+    boardColor: '#fff'
+});
+</script>
 </body>
 </html>
