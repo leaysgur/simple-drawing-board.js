@@ -61,7 +61,8 @@ SimpleDrawingBoard.prototype = {
     // Private
     _ensureEl:          _ensureEl,
     _initBoard:         _initBoard,
-    _initEvents:        _initEvents,
+    _bindEvents:        _bindEvents,
+    _unbindEvents:      _unbindEvents,
     _onInputDown:       _onInputDown,
     _onInputMove:       _onInputMove,
     _onInputUp:         _onInputUp,
@@ -203,18 +204,7 @@ function redo() {
  *
  */
 function dispose() {
-    if (SimpleDrawingBoard.util.isTouch) {
-        this.el.removeEventListener('touchstart',   this, false);
-        this.el.removeEventListener('touchmove',    this, false);
-        this.el.removeEventListener('touchend',     this, false);
-        this.el.removeEventListener('touchcancel',  this, false);
-        this.el.removeEventListener('gesturestart', this, false);
-    } else {
-        this.el.removeEventListener('mousedown', this, false);
-        this.el.removeEventListener('mousemove', this, false);
-        this.el.removeEventListener('mouseup',   this, false);
-        this.el.removeEventListener('mouseout',  this, false);
-    }
+    this._unbindEvents();
 
     SimpleDrawingBoard.util.cAF(this._timer);
     this._timer = null;
@@ -265,7 +255,7 @@ function _initBoard(options) {
     this.setLineColor(settings.lineColor);
     this.clear();
 
-    this._initEvents();
+    this._bindEvents();
     this._draw();
     console.log('Board settings ->', settings);
 }
@@ -273,7 +263,7 @@ function _initBoard(options) {
  * 基本的なイベントを貼る
  *
  */
-function _initEvents() {
+function _bindEvents() {
     if (SimpleDrawingBoard.util.isTouch) {
         this.el.addEventListener('touchstart',   this, false);
         this.el.addEventListener('touchmove',    this, false);
@@ -285,6 +275,24 @@ function _initEvents() {
         this.el.addEventListener('mousemove', this, false);
         this.el.addEventListener('mouseup',   this, false);
         this.el.addEventListener('mouseout',  this, false);
+    }
+}
+/**
+ * 基本的なイベントを剥がす
+ *
+ */
+function _unbindEvents() {
+    if (SimpleDrawingBoard.util.isTouch) {
+        this.el.removeEventListener('touchstart',   this, false);
+        this.el.removeEventListener('touchmove',    this, false);
+        this.el.removeEventListener('touchend',     this, false);
+        this.el.removeEventListener('touchcancel',  this, false);
+        this.el.removeEventListener('gesturestart', this, false);
+    } else {
+        this.el.removeEventListener('mousedown', this, false);
+        this.el.removeEventListener('mousemove', this, false);
+        this.el.removeEventListener('mouseup',   this, false);
+        this.el.removeEventListener('mouseout',  this, false);
     }
 }
 /**
