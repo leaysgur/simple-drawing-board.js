@@ -2,7 +2,7 @@
 'use strict';
 
 if (!global.SimpleDrawingBoard) {
-    throw new Error('SimpleDrawingBoard is not defined.');
+    throw new Error('SimpleDrawingBoard is not defined in window.');
 }
 
 global.SimpleDrawingBoard.util = {

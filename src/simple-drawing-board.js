@@ -1,7 +1,6 @@
 /**
  * TODO:
  * - モバイル
- * - エクスポートまわり
  *
  */
 ;(function(global, undefined) {
@@ -440,7 +439,14 @@ function _goThroughHistory(goForth) {
     }
 }
 
-
+// Export
 global.SimpleDrawingBoard = SimpleDrawingBoard;
+
+// for Require.js
+if (!('process' in global) && (typeof define === 'function' && define.amd)) {
+    define([], function() {
+        return SimpleDrawingBoard;
+    });
+}
 
 }(window));
