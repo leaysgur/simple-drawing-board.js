@@ -87,6 +87,34 @@ sdb.redo(); // go forward history
 sdb.dispose(); // remove all events and clear history
 ```
 
+## Events
+Available events are below.
+
+```javascript
+sdb.ev.on('toggleMode', function(isDrawMode) {
+    if (isDrawMode) {
+        console.log('Draw mode.');
+    } else {
+        console.log('Erase mode.');
+    }
+});
+
+sdb.ev.on('dispose', function() {
+    console.log('Do something on dispose.');
+});
+
+sdb.ev.on('draw', function(coords) {
+    console.log(coords.x, coords.y);
+});
+
+sdb.ev.on('save', function(curImg) {
+    console.log(curImg); // 'data:image/png;base64,xxxxxx....'
+});
+```
+
 ## Alternate
 - [Fabric.js](https://github.com/kangax/fabric.js): More and more functions and utils.
 - [drawingboard.js](https://github.com/Leimi/drawingboard.js): Go with jQuery.
+
+## License
+MIT
