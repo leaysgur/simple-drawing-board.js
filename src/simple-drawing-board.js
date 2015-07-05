@@ -41,6 +41,8 @@ function SimpleDrawingBoard(el, options) {
 
 
 SimpleDrawingBoard.prototype = {
+    constructor:  SimpleDrawingBoard,
+
     // Draw
     setLineSize:  setLineSize,
     setLineColor: setLineColor,
