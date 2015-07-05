@@ -1,7 +1,7 @@
 # simple-drawing-board.js
-Just simple minimal canvas drawing.
+Just simple minimal canvas drawing lib.
 
-You have to make your UIs by your own.
+> You have to make your UIs by your own.
 
 [DEMO](http://labs.lealog.net/sdb)
 
@@ -81,3 +81,7 @@ sdb.redo(); // go forward history
 ```javascript
 sdb.dispose(); // remove all events and clear history
 ```
+
+## Alternate
+- [Fabric.js](https://github.com/kangax/fabric.js): More and more functions and utils.
+- [drawingboard.js](https://github.com/Leimi/drawingboard.js): Go with jQuery.
