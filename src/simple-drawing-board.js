@@ -156,6 +156,8 @@ function toggleMode() {
         }
         settings.isDrawMode = 1;
     }
+
+    this.ev.trigger('toggleMode', settings.isDrawMode);
     return this;
 }
 /**
@@ -182,7 +184,7 @@ function setImg(src) {
         var oldGCO = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = "source-over";
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.globalCompositeOperation = oldGCO;
     };
     img.src = src;
@@ -212,6 +214,8 @@ function dispose() {
     this._timer = null;
 
     this._initHistory();
+
+    this.ev.trigger('dispose');
 }
 /**
  * canvasの存在を確かめる
@@ -303,7 +307,10 @@ function _unbindEvents() {
  *
  */
 function _draw() {
-    if (this._isDrawing) {
+    // さっきと同じ場所なら書かなくていい
+    var isSameCoords = this._coords.old.x === this._coords.current.x &&
+                       this._coords.old.y === this._coords.current.y;
+    if (this._isDrawing && !isSameCoords) {
         var currentMid = this._getMidInputCoords(this._coords.current);
         this.ctx.beginPath();
         this.ctx.moveTo(currentMid.x, currentMid.y);
@@ -312,6 +319,8 @@ function _draw() {
 
         this._coords.old    = this._coords.current;
         this._coords.oldMid = currentMid;
+
+        this.ev.trigger('draw', this._coords.current);
     }
 
     this._timer = SimpleDrawingBoard.util.rAF(this._draw.bind(this));
@@ -447,6 +456,7 @@ function _saveHistory() {
     history.values.push(curImg);
 
     console.log('History saved ->', history);
+    this.ev.trigger('save', curImg);
 }
 /**
  * 履歴から復元する
