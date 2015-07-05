@@ -4,6 +4,7 @@ Just simple minimal canvas drawing lib.
 - under 500 lines of codes
 - minimal functions for drawing
 - no dependencies
+- Mobile compatibility
 
 > You have to make your UIs by your own.
 
