@@ -8,12 +8,14 @@ if (!global.SimpleDrawingBoard) {
 global.SimpleDrawingBoard.util = {
     isTransparent: isTransparent,
     rAF: (rAF()),
+    cAF: (cAF()),
     Eve: Eve,
     Const: {
         settings: {
-            lineColor:  '#aaa',
-            lineSize:   5,
-            boardColor: 'transparent'
+            lineColor:    '#aaa',
+            lineSize:     5,
+            boardColor:   'transparent',
+            historyDepth: 10
         }
     }
 };

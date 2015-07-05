@@ -1,6 +1,5 @@
 /**
  * TODO:
- * - 履歴まわり
  * - モバイル
  * - エクスポートまわり
  * - destroy
@@ -22,6 +21,8 @@ function SimpleDrawingBoard(el, options) {
     this._elRect    = el.getBoundingClientRect();
     // trueの時だけstrokeされる
     this._isDrawing = 0;
+    // 描画用のタイマー
+    this._timer     = null;
     // 座標情報
     this._coords    = {
         old:     { x: 0, y: 0 },
@@ -32,17 +33,20 @@ function SimpleDrawingBoard(el, options) {
         lineColor:     null,
         lineSize:      null,
         boardColor:    null,
+        historyDepth:  null,
         isTransparent: null,
         isDrawMode:    null,
     };
     // 描画履歴
     this._history   = {
-        values:   [],
-        position: 0
+        values:   null,
+        position: null
     };
 
+    this._initHistory();
     this._initBoard(options);
 };
+
 
 SimpleDrawingBoard.prototype = {
     // Draw
@@ -53,10 +57,11 @@ SimpleDrawingBoard.prototype = {
     toggleMode:   toggleMode,
 
     // Util
-    getImg: getImg,
-    setImg: setImg,
-    undo:   undo,
-    redo:   redo,
+    getImg:  getImg,
+    setImg:  setImg,
+    undo:    undo,
+    redo:    redo,
+    dispose: dispose,
 
     // XXX
     handleEvent: _handleEvent,
@@ -71,6 +76,7 @@ SimpleDrawingBoard.prototype = {
     _draw:              _draw,
     _getInputCoords:    _getInputCoords,
     _getMidInputCoords: _getMidInputCoords,
+    _initHistory:       _initHistory,
     _saveHistory:       _saveHistory,
     _goThroughHistory:  _goThroughHistory
 };
@@ -187,6 +193,21 @@ function redo() {
     this._goThroughHistory(true);
 }
 /**
+ * 後始末
+ *
+ */
+function dispose() {
+    this.el.removeEventListener('mousedown', this, false);
+    this.el.removeEventListener('mousemove', this, false);
+    this.el.removeEventListener('mouseup',   this, false);
+    this.el.removeEventListener('mouseout',  this, false);
+
+    SimpleDrawingBoard.util.cAF(this._timer);
+    this._timer = null;
+
+    this._initHistory();
+}
+/**
  * canvasの存在を確かめる
  *
  * @param {HTMLCanvasElement} el
@@ -262,7 +283,7 @@ function _draw() {
     this._coords.old    = this._coords.current;
     this._coords.oldMid = currentMid;
 
-    SimpleDrawingBoard.util.rAF(this._draw.bind(this));
+    this._timer = SimpleDrawingBoard.util.rAF(this._draw.bind(this));
 }
 /**
  * 描画しはじめの処理
@@ -349,6 +370,16 @@ function _getMidInputCoords(coords) {
     };
 }
 /**
+ * 履歴のオブジェクトを初期化
+ *
+ */
+function _initHistory() {
+    this._history = {
+        values:   [],
+        position: 0
+    };
+}
+/**
  * 履歴に現在のボードを保存する
  *
  */
@@ -362,7 +393,7 @@ function _saveHistory() {
 
     // TODO: from options
     // 履歴には限度がある
-    while (history.values.length > 10) {
+    while (history.values.length >= this._settings.historyDepth) {
         history.values.shift();
         history.position--;
     }
