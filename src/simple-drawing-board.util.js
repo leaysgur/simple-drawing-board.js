@@ -6,6 +6,8 @@ if (!global.SimpleDrawingBoard) {
 }
 
 global.SimpleDrawingBoard.util = {
+    isTransparent: isTransparent,
+    rAF: (rAF()),
     Eve: Eve,
     Const: {
         settings: {
@@ -15,6 +17,32 @@ global.SimpleDrawingBoard.util = {
         }
     }
 };
+
+function isTransparent(color) {
+    color = color.replace(/\s/g, '');
+    if (color === 'transparent')   { return true; }
+    // TODO: strict
+    if (color === 'rgba(0,0,0,0)') { return true; }
+    return false;
+}
+
+function rAF() {
+    return (global.requestAnimationFrame       ||
+            global.webkitRequestAnimationFrame ||
+            global.mozRequestAnimationFrame    ||
+            function(callback) {
+                global.setTimeout(callback, 1000 / 60);
+            }).bind(global);
+}
+
+function cAF() {
+    return (global.cancelAnimationFrame       ||
+            global.webkitCancelAnimationFrame ||
+            global.mozCancelAnimationFrame    ||
+            function(callback) {
+                global.clearTimeout(callback);
+            }).bind(global);
+}
 
 function Eve() {
     this._events = {};

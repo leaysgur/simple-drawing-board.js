@@ -14,11 +14,12 @@ var sdb = new SimpleDrawingBoard(el, {
     lineColor:  '#00f',
     lineSize:   50,
     // boardColor: '#fff'
-    boardColor: 'transparent'
+    // boardColor: 'transparent'
+    boardColor: 'rgba(0,0,0,0)'
 });
 
 sdb.fill('#00f');
-sdb.setMode('ERASE');
+sdb.toggleMode();
 </script>
 </body>
 </html>

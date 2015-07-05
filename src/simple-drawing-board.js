@@ -1,6 +1,5 @@
 /**
  * TODO:
- * - 色のバリデーション
  * - 履歴まわり
  *
  * - コメント
@@ -10,20 +9,31 @@
 'use strict';
 
 function SimpleDrawingBoard(el, options) {
+    // canvasの存在チェック
     this._ensureEl(el);
 
     this.ev  = new SimpleDrawingBoard.util.Eve();
     this.el  = el;
     this.ctx = el.getContext('2d');
 
+    // 座標補正のため
     this._elRect    = el.getBoundingClientRect();
+    // trueの時だけstrokeされる
     this._isDrawing = 0;
+    // 座標情報
     this._coords    = {
-        old:     { x:0, y:0 },
-        oldMid:  { x:0, y:0 },
-        current: { x:0, y:0 }
+        old:     { x: 0, y: 0 },
+        oldMid:  { x: 0, y: 0 },
+        current: { x: 0, y: 0 }
     };
-    this._settings  = {};
+    this._settings  = {
+        lineColor:     null,
+        lineSize:      null,
+        boardColor:    null,
+        isTransparent: null,
+        isDrawMode:    null,
+    };
+    // 描画履歴
     this._history   = [];
 
     this._initBoard(options);
@@ -35,7 +45,7 @@ SimpleDrawingBoard.prototype = {
     setLineColor: setLineColor,
     fill:         fill,
     clear:        clear,
-    setMode:      setMode,
+    toggleMode:   toggleMode,
 
     // Util
     getImg: getImg,
@@ -72,48 +82,90 @@ function setLineSize(size) {
  * 線の色を設定する
  *
  * @param {String} color
- *     色(TODO)
+ *     色
  *
  */
 function setLineColor(color) {
-    // TODO: validation
     this.ctx.strokeStyle = color;
     return this;
 }
+/**
+ * 単一の色で塗りつぶす
+ *
+ * @param {String} color
+ *     色
+ *
+ */
 function fill(color) {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    // TODO: validation
     this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     return this;
 }
+/**
+ * ボードをクリアする
+ * 実際は、背景色で塗りつぶす
+ *
+ */
 function clear() {
     this.fill(this._settings.boardColor);
     return this;
 }
-function setMode(mode) {
+/**
+ * 書くモードと消すモードをスイッチ
+ *
+ */
+function toggleMode() {
     var settings = this._settings;
-    if (mode === 'DRAW') {
-        this.setLineColor(settings.lineColor);
-        if (settings.isTransparent) {
-            this.ctx.globalCompositeOperation = 'source-over';
-        }
-    }
-    else {
+    // 消す
+    if (settings.isDrawMode) {
         this.setLineColor(settings.boardColor);
         if (settings.isTransparent) {
             this.ctx.globalCompositeOperation = 'destination-out';
         }
+        settings.isDrawMode = 0;
+    }
+    // 書く
+    else {
+        this.setLineColor(settings.lineColor);
+        if (settings.isTransparent) {
+            this.ctx.globalCompositeOperation = 'source-over';
+        }
+        settings.isDrawMode = 1;
     }
     return this;
 }
+/**
+ * 現在のボードをbase64文字列で取得
+ *
+ * @return {String}
+ *     base64文字列
+ *
+ */
 function getImg() {
     return this.ctx.canvas.toDataURL('image/png');
 }
-function undo() {}
-function redo() {}
-
-
+/**
+ * 履歴を戻す
+ *
+ */
+function undo() {
+    // TODO: implements
+}
+/**
+ * 履歴を進める
+ *
+ */
+function redo() {
+    // TODO: implements
+}
+/**
+ * canvasの存在を確かめる
+ *
+ * @param {HTMLCanvasElement} el
+ *     canvas要素
+ *
+ */
 function _ensureEl(el) {
     if ((!el) ||
        (typeof el !== 'object') ||
@@ -121,7 +173,14 @@ function _ensureEl(el) {
         throw new Error('Pass canvas element as first argument.');
     }
 }
-
+/**
+ * ボードを初期化する
+ *
+ * @param {Object} options
+ *     初期化オプション
+ *     `SimpleDrawingBoard.util.Const.settings`参照
+ *
+ */
 function _initBoard(options) {
     var settings = this._settings = SimpleDrawingBoard.util.Const.settings;
     if (options) {
@@ -130,34 +189,34 @@ function _initBoard(options) {
         }
     }
 
-    if (settings.boardColor === 'transparent') {
+    // 透過な時は消すモードで一手間必要になる
+    if (SimpleDrawingBoard.util.isTransparent(settings.boardColor)) {
         settings.boardColor    = 'rgba(0,0,0,1)';
         settings.isTransparent = 1;
     }
 
+    // 初期は書くモード
+    settings.isDrawMode = 1;
+
     this.ctx.lineCap = this.ctx.lineJoin = 'round';
-    this.setMode('DRAW');
     this.setLineSize(settings.lineSize);
     this.setLineColor(settings.lineColor);
-
     this.clear();
+
     this._initEvents();
-    console.log(settings);
+    this._draw();
+    console.log('Board settings ->', settings);
 }
 
 function _initEvents() {
-    var that = this;
-
     this.el.addEventListener('mousedown', this, false);
     this.el.addEventListener('mousemove', this, false);
     this.el.addEventListener('mouseup',   this, false);
     this.el.addEventListener('mouseout',  this, false);
-
-    this._draw();
-    setInterval(function() { that._draw(); }, 16);
 }
 
 function _draw() {
+    var that = this;
     var currentMid = this._getMidInputCoords(this._coords.current);
     this.ctx.beginPath();
     this.ctx.moveTo(currentMid.x, currentMid.y);
@@ -167,6 +226,8 @@ function _draw() {
 
     this._coords.old    = this._coords.current;
     this._coords.oldMid = currentMid;
+
+    SimpleDrawingBoard.util.rAF(function() { that._draw(); });
 }
 
 function _onInputDown() {
