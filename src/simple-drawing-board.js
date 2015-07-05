@@ -2,8 +2,6 @@
  * TODO:
  * - モバイル
  * - エクスポートまわり
- * - destroy
- * - utilのコメント
  *
  */
 ;(function(global, undefined) {
@@ -114,6 +112,7 @@ function fill(color) {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this._saveHistory();
     return this;
 }
 /**
@@ -122,7 +121,20 @@ function fill(color) {
  *
  */
 function clear() {
-    this.fill(this._settings.boardColor);
+    var settings = this._settings;
+    // 透明なときは一手間
+    if (settings.isTransparent) {
+        var oldGCO = this.ctx.globalCompositeOperation;
+        this.ctx.globalCompositeOperation = 'destination-out';
+        this.fill(this._settings.boardColor);
+        this.ctx.globalCompositeOperation = oldGCO;
+    }
+    // 違うならそのまま
+    else {
+        this.fill(this._settings.boardColor);
+    }
+
+    this._saveHistory();
     return this;
 }
 /**
@@ -250,7 +262,6 @@ function _initBoard(options) {
     this.setLineSize(settings.lineSize);
     this.setLineColor(settings.lineColor);
     this.clear();
-    this._saveHistory();
 
     this._initEvents();
     this._draw();

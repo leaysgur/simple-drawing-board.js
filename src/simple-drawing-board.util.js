@@ -20,6 +20,13 @@ global.SimpleDrawingBoard.util = {
     }
 };
 
+/**
+ * 透過の背景の場合、消すモードの処理が微妙に変わるので、
+ * それをチェックしたい
+ *
+ * @param {String} color
+ *     色
+ */
 function isTransparent(color) {
     color = color.replace(/\s/g, '');
     if (color === 'transparent')   { return true; }
@@ -28,6 +35,10 @@ function isTransparent(color) {
     return false;
 }
 
+/**
+ * requestAnimationFrameのshim
+ *
+ */
 function rAF() {
     return (global.requestAnimationFrame       ||
             global.webkitRequestAnimationFrame ||
@@ -37,6 +48,10 @@ function rAF() {
             }).bind(global);
 }
 
+/**
+ * cancelAnimationFrameのshim
+ *
+ */
 function cAF() {
     return (global.cancelAnimationFrame       ||
             global.webkitCancelAnimationFrame ||
@@ -46,6 +61,11 @@ function cAF() {
             }).bind(global);
 }
 
+/**
+ * Minimal event interface
+ * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
+ *
+ */
 function Eve() {
     this._events = {};
 };
