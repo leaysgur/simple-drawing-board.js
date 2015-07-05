@@ -3,6 +3,8 @@
  * - 履歴まわり
  * - モバイル
  * - エクスポートまわり
+ * - destroy
+ * - utilのコメント
  *
  */
 ;(function(global, undefined) {
