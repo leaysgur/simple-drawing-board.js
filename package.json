@@ -1,0 +1,25 @@
+{
+  "name": "simple-drawing-board",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leader22/simple-drawing-board.js.git"
+  },
+  "author": "leader22",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leader22/simple-drawing-board.js/issues"
+  },
+  "homepage": "https://github.com/leader22/simple-drawing-board.js",
+  "devDependencies": {
+      "gulp": "^3.8.11",
+      "gulp-header": "^1.2.2",
+      "gulp-concat": "^2.6.0",
+      "gulp-uglify": "^1.2.0"
+  }
+}
