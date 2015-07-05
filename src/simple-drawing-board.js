@@ -36,7 +36,10 @@ function SimpleDrawingBoard(el, options) {
         isDrawMode:    null,
     };
     // 描画履歴
-    this._history   = [];
+    this._history   = {
+        values:   [],
+        position: 0
+    };
 
     this._initBoard(options);
 };
@@ -51,6 +54,7 @@ SimpleDrawingBoard.prototype = {
 
     // Util
     getImg: getImg,
+    setImg: setImg,
     undo:   undo,
     redo:   redo,
 
@@ -66,7 +70,9 @@ SimpleDrawingBoard.prototype = {
     _onInputUp:         _onInputUp,
     _draw:              _draw,
     _getInputCoords:    _getInputCoords,
-    _getMidInputCoords: _getMidInputCoords
+    _getMidInputCoords: _getMidInputCoords,
+    _saveHistory:       _saveHistory,
+    _goThroughHistory:  _goThroughHistory
 };
 
 /**
@@ -148,18 +154,37 @@ function getImg() {
     return this.ctx.canvas.toDataURL('image/png');
 }
 /**
+ * 現在のボードをbase64文字列で復元
+ *
+ * @param {String} src
+ *     base64文字列
+ *
+ */
+function setImg(src) {
+    var ctx = this.ctx;
+    var img = new Image();
+    img.onload = function() {
+        var oldGCO = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = "source-over";
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.drawImage(img, 0, 0);
+        ctx.globalCompositeOperation = oldGCO;
+    };
+    img.src = src;
+}
+/**
  * 履歴を戻す
  *
  */
 function undo() {
-    // TODO: implements
+    this._goThroughHistory(false);
 }
 /**
  * 履歴を進める
  *
  */
 function redo() {
-    // TODO: implements
+    this._goThroughHistory(true);
 }
 /**
  * canvasの存在を確かめる
@@ -204,6 +229,7 @@ function _initBoard(options) {
     this.setLineSize(settings.lineSize);
     this.setLineColor(settings.lineColor);
     this.clear();
+    this._saveHistory();
 
     this._initEvents();
     this._draw();
@@ -258,6 +284,7 @@ function _onInputMove(ev) {
  */
 function _onInputUp() {
     this._isDrawing = 0;
+    this._saveHistory();
 }
 /**
  * いわゆるhandleEvent
@@ -321,6 +348,56 @@ function _getMidInputCoords(coords) {
         y: this._coords.old.y + coords.y>>1
     };
 }
+/**
+ * 履歴に現在のボードを保存する
+ *
+ */
+function _saveHistory() {
+    var history = this._history;
+
+    // 最後の履歴と同じ結果なら保存しない
+    var curImg  = this.getImg();
+    var lastImg = history.values[history.values.length-1];
+    if (lastImg && curImg === lastImg) { return; }
+
+    // TODO: from options
+    // 履歴には限度がある
+    while (history.values.length > 10) {
+        history.values.shift();
+        history.position--;
+    }
+
+    if (history.position !== 0 && history.position < history.values.length) {
+        history.values = history.values.slice(0, history.position);
+        history.position++;
+    } else {
+        history.position = history.values.length + 1;
+    }
+    history.values.push(curImg);
+
+    console.log('History saved ->', history);
+}
+/**
+ * 履歴から復元する
+ *
+ * @param {Boolean} goForth
+ *     戻す or やり直すで、やり直すならtrue
+ *
+ */
+function _goThroughHistory(goForth) {
+    var history = this._history;
+    if ((goForth && history.position === history.values.length) ||
+            (!goForth && history.position === 1)) {
+        return;
+    }
+
+    var pos = goForth ? history.position + 1 : history.position - 1;
+    if (history.values.length && history.values[pos-1] !== undefined) {
+        history.position = pos;
+        this.setImg(history.values[pos-1]);
+    }
+}
+
 
 global.SimpleDrawingBoard = SimpleDrawingBoard;
 
