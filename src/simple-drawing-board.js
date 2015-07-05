@@ -1,8 +1,8 @@
 /**
  * TODO:
  * - 履歴まわり
- *
- * - コメント
+ * - モバイル
+ * - エクスポートまわり
  *
  */
 ;(function(global, undefined) {
@@ -207,17 +207,24 @@ function _initBoard(options) {
     this._draw();
     console.log('Board settings ->', settings);
 }
-
+/**
+ * 基本的なイベントを貼る
+ *
+ */
 function _initEvents() {
     this.el.addEventListener('mousedown', this, false);
     this.el.addEventListener('mousemove', this, false);
     this.el.addEventListener('mouseup',   this, false);
     this.el.addEventListener('mouseout',  this, false);
 }
-
+/**
+ * 実際の描画処理
+ * 別のイベントで集めた座標情報を元に、描画するだけ
+ *
+ */
 function _draw() {
-    var that = this;
     var currentMid = this._getMidInputCoords(this._coords.current);
+
     this.ctx.beginPath();
     this.ctx.moveTo(currentMid.x, currentMid.y);
     this.ctx.quadraticCurveTo(this._coords.old.x, this._coords.old.y, this._coords.oldMid.x, this._coords.oldMid.y);
@@ -227,20 +234,36 @@ function _draw() {
     this._coords.old    = this._coords.current;
     this._coords.oldMid = currentMid;
 
-    SimpleDrawingBoard.util.rAF(function() { that._draw(); });
+    SimpleDrawingBoard.util.rAF(this._draw.bind(this));
 }
-
+/**
+ * 描画しはじめの処理
+ *
+ */
 function _onInputDown() {
     this._isDrawing = 1;
 }
+/**
+ * 描画してる間の処理
+ *
+ */
 function _onInputMove(ev) {
-    var coords = this._getInputCoords(ev);
-    this._coords.current = coords;
+    this._coords.current = this._getInputCoords(ev);
 }
+/**
+ * 描画しおわりの処理
+ *
+ */
 function _onInputUp() {
     this._isDrawing = 0;
 }
-
+/**
+ * いわゆるhandleEvent
+ *
+ * @param {Object} ev
+ *     イベント
+ *
+ */
 function _handleEvent(ev) {
     ev.preventDefault();
     ev.stopPropagation();
@@ -258,7 +281,15 @@ function _handleEvent(ev) {
         break;
     }
 }
-
+/**
+ * 座標の取得
+ *
+ * @param {Object} ev
+ *     イベント
+ * @return {Object}
+ *     x, y座標
+ *
+ */
 function _getInputCoords(ev) {
     var x, y;
     if (ev.touches && ev.touches.length === 1) {
@@ -273,7 +304,15 @@ function _getInputCoords(ev) {
         y: y - this._elRect.top
     };
 }
-
+/**
+ * 座標の取得
+ *
+ * @param {Object} coords
+ *     元のx, y座標
+ * @return {Object}
+ *     変換されたx, y座標
+ *
+ */
 function _getMidInputCoords(coords) {
     return {
         x: this._coords.old.x + coords.x>>1,
@@ -281,7 +320,6 @@ function _getMidInputCoords(coords) {
     };
 }
 
-// TODO: AMD/commonJS
 global.SimpleDrawingBoard = SimpleDrawingBoard;
 
 }(window));
