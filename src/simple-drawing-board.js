@@ -428,15 +428,15 @@ function _saveHistory() {
  */
 function _goThroughHistory(goForth) {
     var history = this._history;
-    if ((goForth && history.position === history.values.length) ||
-            (!goForth && history.position === 1)) {
+    if (( goForth && history.position === history.values.length) ||
+        (!goForth && history.position === 1)) {
         return;
     }
 
     var pos = goForth ? history.position + 1 : history.position - 1;
-    if (history.values.length && history.values[pos-1] !== undefined) {
+    if (history.values.length && history.values[pos - 1] !== undefined) {
         history.position = pos;
-        this.setImg(history.values[pos-1]);
+        this.setImg(history.values[pos - 1]);
     }
 }
 
