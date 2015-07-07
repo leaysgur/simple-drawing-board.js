@@ -37,7 +37,7 @@ function SimpleDrawingBoard(el, options) {
 
     this._initHistory();
     this._initBoard(options);
-};
+}
 
 
 SimpleDrawingBoard.prototype = {
@@ -177,16 +177,20 @@ function getImg() {
  *
  * @param {String|HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} src
  *     画像URLか、drawImageできる要素
+ * @param {Boolean} isOverlay
+ *     上に重ねるならtrue
  *
  */
-function setImg(src) {
+function setImg(src, isOverlay) {
+    isOverlay = isOverlay || false;
+
     // imgUrl
     if (typeof src === 'string') {
-        this._setImgByImgSrc(src);
+        this._setImgByImgSrc(src, isOverlay);
     }
     // img, video, canvas element
     else {
-        this._setImgByDrawableEl(src);
+        this._setImgByDrawableEl(src, isOverlay);
     }
 
     this._saveHistory();
@@ -427,16 +431,18 @@ function _getMidInputCoords(coords) {
  *
  * @param {String} src
  *     画像URL
+ * @param {Boolean} isOverlay
+ *     現在のボードを消さずに復元するならtrue
  *
  */
-function _setImgByImgSrc(src) {
+function _setImgByImgSrc(src, isOverlay) {
     var ctx    = this.ctx;
     var oldGCO = ctx.globalCompositeOperation;
     var img    = new Image();
 
     img.onload = function() {
         ctx.globalCompositeOperation = 'source-over';
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        isOverlay || ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.globalCompositeOperation = oldGCO;
     };
@@ -448,16 +454,18 @@ function _setImgByImgSrc(src) {
  *
  * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} el
  *     drawImageできる要素
+ * @param {Boolean} isOverlay
+ *     現在のボードを消さずに復元するならtrue
  *
  */
-function _setImgByDrawableEl(el) {
+function _setImgByDrawableEl(el, isOverlay) {
     if (!SimpleDrawingBoard.util.isDrawableEl(el)) { return; }
 
     var ctx    = this.ctx;
     var oldGCO = ctx.globalCompositeOperation;
 
     ctx.globalCompositeOperation = 'source-over';
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    isOverlay || ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage(el, 0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.globalCompositeOperation = oldGCO;
 }
