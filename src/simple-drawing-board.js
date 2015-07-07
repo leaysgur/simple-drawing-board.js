@@ -435,7 +435,7 @@ function _setImgByImgSrc(src) {
     var img    = new Image();
 
     img.onload = function() {
-        ctx.globalCompositeOperation = "source-over";
+        ctx.globalCompositeOperation = 'source-over';
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.globalCompositeOperation = oldGCO;
@@ -456,7 +456,7 @@ function _setImgByDrawableEl(el) {
     var ctx    = this.ctx;
     var oldGCO = ctx.globalCompositeOperation;
 
-    ctx.globalCompositeOperation = "source-over";
+    ctx.globalCompositeOperation = 'source-over';
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage(el, 0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.globalCompositeOperation = oldGCO;
