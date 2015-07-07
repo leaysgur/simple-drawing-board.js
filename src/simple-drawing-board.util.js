@@ -8,6 +8,7 @@ if (!global.SimpleDrawingBoard) {
 global.SimpleDrawingBoard.util = {
     isTouch:       (isTouch()),
     isTransparent: isTransparent,
+    isDrawableEl:  isDrawableEl,
     rAF: (rAF()),
     cAF: (cAF()),
     Eve: Eve,
@@ -44,6 +45,25 @@ function isTransparent(color) {
     // TODO: strict
     if (color === 'rgba(0,0,0,0)') { return true; }
     return false;
+}
+
+/**
+ * ctx.drawImageできるのは3つ
+ *
+ * @param {HTMLElement} el
+ *     チェックする要素
+ * @return {Boolean}
+ *     描画できる要素かどうか
+ *
+ */
+function isDrawableEl(el) {
+    var isDrawable = [
+        'img',
+        'canvas',
+        'video'
+    ].indexOf(el.tagName.toLowerCase()) !== -1;
+
+    return isDrawable;
 }
 
 /**

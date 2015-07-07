@@ -61,19 +61,21 @@ SimpleDrawingBoard.prototype = {
     handleEvent: _handleEvent,
 
     // Private
-    _ensureEl:          _ensureEl,
-    _initBoard:         _initBoard,
-    _bindEvents:        _bindEvents,
-    _unbindEvents:      _unbindEvents,
-    _onInputDown:       _onInputDown,
-    _onInputMove:       _onInputMove,
-    _onInputUp:         _onInputUp,
-    _draw:              _draw,
-    _getInputCoords:    _getInputCoords,
-    _getMidInputCoords: _getMidInputCoords,
-    _initHistory:       _initHistory,
-    _saveHistory:       _saveHistory,
-    _goThroughHistory:  _goThroughHistory
+    _ensureEl:           _ensureEl,
+    _initBoard:          _initBoard,
+    _bindEvents:         _bindEvents,
+    _unbindEvents:       _unbindEvents,
+    _onInputDown:        _onInputDown,
+    _onInputMove:        _onInputMove,
+    _onInputUp:          _onInputUp,
+    _draw:               _draw,
+    _getInputCoords:     _getInputCoords,
+    _getMidInputCoords:  _getMidInputCoords,
+    _setImgByImgSrc:     _setImgByImgSrc,
+    _setImgByDrawableEl: _setImgByDrawableEl,
+    _initHistory:        _initHistory,
+    _saveHistory:        _saveHistory,
+    _goThroughHistory:   _goThroughHistory
 };
 
 /**
@@ -171,23 +173,24 @@ function getImg() {
     return this.ctx.canvas.toDataURL('image/png');
 }
 /**
- * 現在のボードをbase64文字列で復元
+ * 現在のボードをなんかしら復元
  *
- * @param {String} src
- *     base64文字列
+ * @param {String|HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} src
+ *     画像URLか、drawImageできる要素
  *
  */
 function setImg(src) {
-    var ctx = this.ctx;
-    var img = new Image();
-    img.onload = function() {
-        var oldGCO = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = "source-over";
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.globalCompositeOperation = oldGCO;
-    };
-    img.src = src;
+    // imgUrl
+    if (typeof src === 'string') {
+        this._setImgByImgSrc(src);
+    }
+    // img, video, canvas element
+    else {
+        this._setImgByDrawableEl(src);
+    }
+
+    this._saveHistory();
+    return this;
 }
 /**
  * 履歴を戻す
@@ -418,6 +421,45 @@ function _getMidInputCoords(coords) {
         x: this._coords.old.x + coords.x>>1,
         y: this._coords.old.y + coords.y>>1
     };
+}
+/**
+ * 現在のボードを画像URLから復元
+ *
+ * @param {String} src
+ *     画像URL
+ *
+ */
+function _setImgByImgSrc(src) {
+    var ctx    = this.ctx;
+    var oldGCO = ctx.globalCompositeOperation;
+    var img    = new Image();
+
+    img.onload = function() {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.globalCompositeOperation = oldGCO;
+    };
+
+    img.src = src;
+}
+/**
+ * 現在のボードを特定の要素から復元
+ *
+ * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} el
+ *     drawImageできる要素
+ *
+ */
+function _setImgByDrawableEl(el) {
+    if (!SimpleDrawingBoard.util.isDrawableEl(el)) { return; }
+
+    var ctx    = this.ctx;
+    var oldGCO = ctx.globalCompositeOperation;
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(el, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.globalCompositeOperation = oldGCO;
 }
 /**
  * 履歴のオブジェクトを初期化
