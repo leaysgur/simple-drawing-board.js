@@ -180,8 +180,6 @@ function getImg() {
  *
  */
 function setImg(src) {
-    var ctx = this.ctx;
-
     // imgUrl
     if (typeof src === 'string') {
         this._setImgByImgSrc(src);
@@ -432,14 +430,17 @@ function _getMidInputCoords(coords) {
  *
  */
 function _setImgByImgSrc(src) {
-    var img = new Image();
+    var ctx    = this.ctx;
+    var oldGCO = ctx.globalCompositeOperation;
+    var img    = new Image();
+
     img.onload = function() {
-        var oldGCO = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = "source-over";
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.globalCompositeOperation = oldGCO;
     };
+
     img.src = src;
 }
 /**
@@ -450,9 +451,11 @@ function _setImgByImgSrc(src) {
  *
  */
 function _setImgByDrawableEl(el) {
-    if (!SimpleDrawingBoard.util.isDrawableEl(src)) { return; }
+    if (!SimpleDrawingBoard.util.isDrawableEl(el)) { return; }
 
+    var ctx    = this.ctx;
     var oldGCO = ctx.globalCompositeOperation;
+
     ctx.globalCompositeOperation = "source-over";
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage(el, 0, 0, ctx.canvas.width, ctx.canvas.height);
