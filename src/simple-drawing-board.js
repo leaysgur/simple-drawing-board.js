@@ -394,7 +394,7 @@ function _handleEvent(ev) {
  */
 function _getInputCoords(ev) {
     var x, y;
-    if (ev.touches && ev.touches.length === 1) {
+    if (SimpleDrawingBoard.util.isTouch) {
         x = ev.touches[0].pageX;
         y = ev.touches[0].pageY;
     } else {
