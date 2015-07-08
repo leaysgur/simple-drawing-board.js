@@ -6,12 +6,20 @@ if (!global.SimpleDrawingBoard) {
 }
 
 global.SimpleDrawingBoard.util = {
-    isTouch:       (isTouch()),
-    isTransparent: isTransparent,
-    isDrawableEl:  isDrawableEl,
+    // 便利メソッドたち
+    isTouch:         (isTouch()),
+    isTransparent:   isTransparent,
+    isDrawableEl:    isDrawableEl,
+    getAdjustedRect: getAdjustedRect,
+
+    // shim
     rAF: (rAF()),
     cAF: (cAF()),
+
+    // EA
     Eve: Eve,
+
+    // THE 定数
     Const: {
         settings: {
             lineColor:    '#aaa',
@@ -67,6 +75,24 @@ function isDrawableEl(el) {
 }
 
 /**
+ * スクロールされた状態でリロードすると、位置ズレするっぽいので、
+ * スクロール位置も加味してgetBoundingClientRectする
+ *
+ * @param {HTMLElement} el
+ *     チェックする要素
+ * @return {Object}
+ *     left / topの位置
+ *
+ */
+function getAdjustedRect(el) {
+    var elRect = el.getBoundingClientRect();
+    return {
+      left: elRect.left + global.scrollX,
+      top:  elRect.top  + global.scrollY
+    };
+}
+
+/**
  * requestAnimationFrameのshim
  *
  */
@@ -99,7 +125,7 @@ function cAF() {
  */
 function Eve() {
     this._events = {};
-};
+}
 Eve.prototype = {
     constructor: Eve,
     on: function(evName, handler) {

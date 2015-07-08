@@ -10,7 +10,7 @@ function SimpleDrawingBoard(el, options) {
     this.ctx = el.getContext('2d');
 
     // 座標補正のため
-    this._elRect    = el.getBoundingClientRect();
+    this._elRect    = SimpleDrawingBoard.util.getAdjustedRect(el);
     // trueの時だけstrokeされる
     this._isDrawing = 0;
     // 描画用のタイマー
@@ -31,8 +31,8 @@ function SimpleDrawingBoard(el, options) {
     };
     // 描画履歴
     this._history   = {
-        values:   null,
-        position: null
+        items: null,
+        idx:   null
     };
 
     this._initHistory();
@@ -65,6 +65,7 @@ SimpleDrawingBoard.prototype = {
     _initBoard:          _initBoard,
     _bindEvents:         _bindEvents,
     _unbindEvents:       _unbindEvents,
+    _bindOrUnbindEvents: _bindOrUnbindEvents,
     _onInputDown:        _onInputDown,
     _onInputMove:        _onInputMove,
     _onInputUp:          _onInputUp,
@@ -75,7 +76,7 @@ SimpleDrawingBoard.prototype = {
     _setImgByDrawableEl: _setImgByDrawableEl,
     _initHistory:        _initHistory,
     _saveHistory:        _saveHistory,
-    _goThroughHistory:   _goThroughHistory
+    _restoreFromHistory: _restoreFromHistory
 };
 
 /**
@@ -201,14 +202,14 @@ function setImg(src, isOverlay) {
  *
  */
 function undo() {
-    this._goThroughHistory(false);
+    this._restoreFromHistory(false);
 }
 /**
  * 履歴を進める
  *
  */
 function redo() {
-    this._goThroughHistory(true);
+    this._restoreFromHistory(true);
 }
 /**
  * 後始末
@@ -277,35 +278,29 @@ function _initBoard(options) {
  *
  */
 function _bindEvents() {
-    if (SimpleDrawingBoard.util.isTouch) {
-        this.el.addEventListener('touchstart',   this, false);
-        this.el.addEventListener('touchmove',    this, false);
-        this.el.addEventListener('touchend',     this, false);
-        this.el.addEventListener('touchcancel',  this, false);
-        this.el.addEventListener('gesturestart', this, false);
-    } else {
-        this.el.addEventListener('mousedown', this, false);
-        this.el.addEventListener('mousemove', this, false);
-        this.el.addEventListener('mouseup',   this, false);
-        this.el.addEventListener('mouseout',  this, false);
-    }
+  this._bindOrUnbindEvents(true);
 }
 /**
  * 基本的なイベントを剥がす
  *
  */
 function _unbindEvents() {
-    if (SimpleDrawingBoard.util.isTouch) {
-        this.el.removeEventListener('touchstart',   this, false);
-        this.el.removeEventListener('touchmove',    this, false);
-        this.el.removeEventListener('touchend',     this, false);
-        this.el.removeEventListener('touchcancel',  this, false);
-        this.el.removeEventListener('gesturestart', this, false);
-    } else {
-        this.el.removeEventListener('mousedown', this, false);
-        this.el.removeEventListener('mousemove', this, false);
-        this.el.removeEventListener('mouseup',   this, false);
-        this.el.removeEventListener('mouseout',  this, false);
+  this._bindOrUnbindEvents(false);
+}
+/**
+ * 基本的なイベントを貼る / 剥がす
+ *
+ * @param {Boolean} bind
+ *     貼るならtrue
+ */
+function _bindOrUnbindEvents(bind) {
+    var events = (SimpleDrawingBoard.util.isTouch) ?
+        ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'gesturestart'] :
+        ['mousedown', 'mousemove', 'mouseup', 'mouseout'];
+    var method = bind ? 'addEventListener' : 'removeEventListener';
+
+    for (var i = 0, l = events.length; i < l; i++) {
+        this.el[method](events[i], this, false);
     }
 }
 /**
@@ -399,7 +394,7 @@ function _handleEvent(ev) {
  */
 function _getInputCoords(ev) {
     var x, y;
-    if (ev.touches && ev.touches.length === 1) {
+    if (SimpleDrawingBoard.util.isTouch) {
         x = ev.touches[0].pageX;
         y = ev.touches[0].pageY;
     } else {
@@ -475,8 +470,8 @@ function _setImgByDrawableEl(el, isOverlay) {
  */
 function _initHistory() {
     this._history = {
-        values:   [],
-        position: 0
+        items: [],
+        idx:   0
     };
 }
 /**
@@ -488,25 +483,28 @@ function _saveHistory() {
 
     // 最後の履歴と同じ結果なら保存しない
     var curImg  = this.getImg();
-    var lastImg = history.values[history.values.length-1];
+    var lastImg = history.items[history.items.length - 1];
     if (lastImg && curImg === lastImg) { return; }
 
     // 履歴には限度がある
-    while (history.values.length >= this._settings.historyDepth) {
-        history.values.shift();
-        history.position--;
+    while (history.items.length >= this._settings.historyDepth) {
+        history.items.shift();
+        history.idx--;
     }
 
-    if (history.position !== 0 && history.position < history.values.length) {
-        history.values = history.values.slice(0, history.position);
-        history.position++;
-    } else {
-        history.position = history.values.length + 1;
+    // undoしてると、idxとitemsがズレるので、それを補正してからセーブ
+    if (history.idx !== 0 && history.idx < history.items.length) {
+        history.items = history.items.slice(0, history.idx);
+        history.idx++;
     }
-    history.values.push(curImg);
+    // 普通にセーブ
+    else {
+        history.idx = history.items.length + 1;
+    }
 
-    console.log('History saved ->', history);
+    history.items.push(curImg);
     this.ev.trigger('save', curImg);
+    console.log('History saved ->', history);
 }
 /**
  * 履歴から復元する
@@ -515,17 +513,18 @@ function _saveHistory() {
  *     戻す or やり直すで、やり直すならtrue
  *
  */
-function _goThroughHistory(goForth) {
+function _restoreFromHistory(goForth) {
     var history = this._history;
-    if (( goForth && history.position === history.values.length) ||
-        (!goForth && history.position === 1)) {
+    // redoされても先がない場合 / undoされても前がない場合
+    if (( goForth && history.idx === history.items.length) ||
+        (!goForth && history.idx === 1)) {
         return;
     }
 
-    var pos = goForth ? history.position + 1 : history.position - 1;
-    if (history.values.length && history.values[pos - 1] !== undefined) {
-        history.position = pos;
-        this.setImg(history.values[pos - 1]);
+    var idx = goForth ? history.idx + 1 : history.idx - 1;
+    if (history.items.length && history.items[idx - 1] !== undefined) {
+        history.idx = idx;
+        this.setImg(history.items[idx - 1]);
     }
 }
 
