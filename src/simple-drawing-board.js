@@ -65,6 +65,7 @@ SimpleDrawingBoard.prototype = {
     _initBoard:          _initBoard,
     _bindEvents:         _bindEvents,
     _unbindEvents:       _unbindEvents,
+    _bindOrUnbindEvents: _bindOrUnbindEvents,
     _onInputDown:        _onInputDown,
     _onInputMove:        _onInputMove,
     _onInputUp:          _onInputUp,
@@ -277,35 +278,29 @@ function _initBoard(options) {
  *
  */
 function _bindEvents() {
-    if (SimpleDrawingBoard.util.isTouch) {
-        this.el.addEventListener('touchstart',   this, false);
-        this.el.addEventListener('touchmove',    this, false);
-        this.el.addEventListener('touchend',     this, false);
-        this.el.addEventListener('touchcancel',  this, false);
-        this.el.addEventListener('gesturestart', this, false);
-    } else {
-        this.el.addEventListener('mousedown', this, false);
-        this.el.addEventListener('mousemove', this, false);
-        this.el.addEventListener('mouseup',   this, false);
-        this.el.addEventListener('mouseout',  this, false);
-    }
+  this._bindOrUnbindEvents(true);
 }
 /**
  * 基本的なイベントを剥がす
  *
  */
 function _unbindEvents() {
-    if (SimpleDrawingBoard.util.isTouch) {
-        this.el.removeEventListener('touchstart',   this, false);
-        this.el.removeEventListener('touchmove',    this, false);
-        this.el.removeEventListener('touchend',     this, false);
-        this.el.removeEventListener('touchcancel',  this, false);
-        this.el.removeEventListener('gesturestart', this, false);
-    } else {
-        this.el.removeEventListener('mousedown', this, false);
-        this.el.removeEventListener('mousemove', this, false);
-        this.el.removeEventListener('mouseup',   this, false);
-        this.el.removeEventListener('mouseout',  this, false);
+  this._bindOrUnbindEvents(false);
+}
+/**
+ * 基本的なイベントを貼る / 剥がす
+ *
+ * @param {Boolean} bind
+ *     貼るならtrue
+ */
+function _bindOrUnbindEvents(bind) {
+    var events = (SimpleDrawingBoard.util.isTouch) ?
+        ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'gesturestart'] :
+        ['mousedown', 'mousemove', 'mouseup', 'mouseout'];
+    var method = bind ? 'addEventListener' : 'removeEventListener';
+
+    for (var i = 0, l = events.length; i < l; i++) {
+        this.el[method](events[i], this, false);
     }
 }
 /**
