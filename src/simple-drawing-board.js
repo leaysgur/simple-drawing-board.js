@@ -10,7 +10,7 @@ function SimpleDrawingBoard(el, options) {
     this.ctx = el.getContext('2d');
 
     // 座標補正のため
-    this._elRect    = el.getBoundingClientRect();
+    this._elRect    = SimpleDrawingBoard.util.getAdjustedRect(el);
     // trueの時だけstrokeされる
     this._isDrawing = 0;
     // 描画用のタイマー
