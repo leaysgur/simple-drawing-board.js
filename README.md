@@ -69,7 +69,8 @@ sdb.getImg(); // 'data:image/png;base64,xxxxxx....'
 
 ### setImg
 ```javascript
-sdb.setImg('data:image/png;base64,xxxxxx....');
+sdb.setImg('data:image/png;base64,xxxxxx....');       // replace 
+sdb.setImg('data:image/png;base64,xxxxxx....', true); // overlay
 ```
 
 ### undo
