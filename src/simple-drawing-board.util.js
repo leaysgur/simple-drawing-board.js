@@ -50,8 +50,10 @@ function isTouch() {
 function isTransparent(color) {
     color = color.replace(/\s/g, '');
     if (color === 'transparent')   { return true; }
-    // TODO: strict
-    if (color === 'rgba(0,0,0,0)') { return true; }
+
+    var isRgbaOrHlsaTransparent = color.split(',')[3] === '0)';
+    if (isRgbaOrHlsaTransparent) { return true; }
+
     return false;
 }
 
