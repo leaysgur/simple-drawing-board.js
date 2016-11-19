@@ -8,7 +8,19 @@ Just simple minimal canvas drawing lib.
 
 > You have to make your UIs by your own.
 
-[DEMO](http://labs.lealog.net/sdb)
+[DEMO](https://leader22.github.io/simple-drawing-board.js/index.html)
+
+
+## Install
+```sh
+npm i simple-drawing-board
+```
+
+or
+
+```html
+<script src="./path/to/dist/simple-drawing-board.min.js"></script>
+```
 
 ## How to use
 ```html
@@ -16,6 +28,9 @@ Just simple minimal canvas drawing lib.
 ```
 
 ```javascript
+// if installed by npm
+var SimpleDrawingBoard = require('simple-drawing-board');
+
 var sdb = new SimpleDrawingBoard(document.getElementById('canvas'));
 ```
 
@@ -69,7 +84,7 @@ sdb.getImg(); // 'data:image/png;base64,xxxxxx....'
 
 ### setImg
 ```javascript
-sdb.setImg('data:image/png;base64,xxxxxx....');       // replace 
+sdb.setImg('data:image/png;base64,xxxxxx....');       // replace
 sdb.setImg('data:image/png;base64,xxxxxx....', true); // overlay
 ```
 
