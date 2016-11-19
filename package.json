@@ -2,13 +2,13 @@
   "name": "simple-drawing-board",
   "version": "1.2.3",
   "description": "",
-  "main": "./src/index.js",
+  "main": "./index.js",
   "scripts": {
     "build": "npm run _bundle && npm run _min && npm run _docs",
-    "_bundle": "browserify ./src/index.js -o ./dist/simple-drawing-board.js",
+    "_bundle": "browserify ./index.js -o ./dist/simple-drawing-board.js",
     "_min": "uglifyjs ./dist/simple-drawing-board.js > ./dist/simple-drawing-board.min.js",
     "_docs": "cp ./dist/simple-drawing-board.min.js ./docs",
-    "dev": "watchify ./src/index.js -o ./dist/simple-drawing-board.js"
+    "dev": "watchify ./index.js -o ./dist/simple-drawing-board.js"
   },
   "repository": {
     "type": "git",
