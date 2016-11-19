@@ -7,7 +7,7 @@
     "build": "npm run _bundle && npm run _min && npm run _docs",
     "_bundle": "browserify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js",
     "_min": "uglifyjs ./dist/simple-drawing-board.js -c drop_console > ./dist/simple-drawing-board.min.js",
-    "_docs": "cp ./dist/simple-drawing-board.min.js ./docs",
+    "_docs": "cp ./dist/simple-drawing-board.js ./docs",
     "dev": "watchify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js"
   },
   "repository": {
