@@ -272,7 +272,6 @@ function _initBoard(options) {
 
     this._bindEvents();
     this._draw();
-    console.log('Board settings ->', settings);
 }
 /**
  * 基本的なイベントを貼る
@@ -505,7 +504,6 @@ function _saveHistory() {
 
     history.items.push(curImg);
     this.ev.trigger('save', curImg);
-    console.log('History saved ->', history);
 }
 /**
  * 履歴から復元する
