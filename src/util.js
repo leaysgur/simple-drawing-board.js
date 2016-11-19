@@ -1,11 +1,4 @@
-;(function(global, undefined) {
-'use strict';
-
-if (!global.SimpleDrawingBoard) {
-    throw new Error('SimpleDrawingBoard is not defined in window.');
-}
-
-global.SimpleDrawingBoard.util = {
+var Util = {
     // 便利メソッドたち
     isTouch:         (isTouch()),
     isTransparent:   isTransparent,
@@ -18,16 +11,6 @@ global.SimpleDrawingBoard.util = {
 
     // EA
     Eve: Eve,
-
-    // THE 定数
-    Const: {
-        settings: {
-            lineColor:    '#aaa',
-            lineSize:     5,
-            boardColor:   'transparent',
-            historyDepth: 10
-        }
-    }
 };
 
 /**
@@ -168,4 +151,4 @@ Eve.prototype = {
     }
 };
 
-}(window));
+module.exports = Util;

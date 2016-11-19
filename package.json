@@ -2,9 +2,13 @@
   "name": "simple-drawing-board",
   "version": "1.2.3",
   "description": "",
-  "main": "",
+  "main": "./src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run _bundle && npm run _min && npm run _docs",
+    "_bundle": "browserify ./src/index.js -o ./dist/simple-drawing-board.js",
+    "_min": "uglifyjs ./dist/simple-drawing-board.js > ./dist/simple-drawing-board.min.js",
+    "_docs": "cp ./dist/simple-drawing-board.min.js ./docs",
+    "dev": "watchify ./src/index.js -o ./dist/simple-drawing-board.js"
   },
   "repository": {
     "type": "git",
@@ -17,9 +21,8 @@
   },
   "homepage": "https://github.com/leader22/simple-drawing-board.js",
   "devDependencies": {
-      "gulp": "^3.8.11",
-      "gulp-header": "^1.2.2",
-      "gulp-concat": "^2.6.0",
-      "gulp-uglify": "^1.2.0"
+    "browserify": "^13.1.1",
+    "uglifyify": "^3.0.4",
+    "watchify": "^3.7.0"
   }
 }
