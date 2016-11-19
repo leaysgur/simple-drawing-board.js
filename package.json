@@ -2,7 +2,7 @@
   "name": "simple-drawing-board",
   "version": "1.3.4",
   "description": "",
-  "main": "./src/simple-drawing-board.js",
+  "main": "./dist/simple-drawing-board.min.js",
   "scripts": {
     "build": "npm run _bundle && npm run _min && npm run _docs",
     "_bundle": "browserify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js",
