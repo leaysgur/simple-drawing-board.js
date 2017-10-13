@@ -401,6 +401,7 @@ function _getInputCoords(ev) {
         x = ev.pageX;
         y = ev.pageY;
     }
+    this._elRect = Util.getAdjustedRect(this.el);
     return {
         x: x - this._elRect.left,
         y: y - this._elRect.top
