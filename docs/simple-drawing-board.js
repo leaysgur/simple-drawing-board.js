@@ -23,7 +23,7 @@ function SimpleDrawingBoard(el, options) {
     this.ctx = el.getContext('2d');
 
     // 座標補正のため
-    this._elRect    = Util.getAdjustedRect(el);
+    this._elRect    = { left: 0, top: 0 };
     // trueの時だけstrokeされる
     this._isDrawing = 0;
     // 描画用のタイマー
@@ -413,7 +413,10 @@ function _getInputCoords(ev) {
         x = ev.pageX;
         y = ev.pageY;
     }
+
+    // いつリサイズされてもよいようリアルタイムに
     this._elRect = Util.getAdjustedRect(this.el);
+
     return {
         x: x - this._elRect.left,
         y: y - this._elRect.top
