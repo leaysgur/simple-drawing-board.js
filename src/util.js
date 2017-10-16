@@ -4,6 +4,7 @@ var Util = {
     isTransparent:   isTransparent,
     isDrawableEl:    isDrawableEl,
     getAdjustedRect: getAdjustedRect,
+    getScale:        getScale,
 
     // shim
     rAF: (rAF()),
@@ -74,6 +75,24 @@ function getAdjustedRect(el) {
     return {
       left: elRect.left + global.scrollX,
       top:  elRect.top  + global.scrollY
+    };
+}
+
+/**
+ * 要素の実際のwidth/heightと、style上のwidth/heightの比を返す
+ * canvasのstyleを指定すると座標がずれるため
+ *
+ * @param {HTMLElement} el
+ *     チェックする要素
+ * @return {Object}
+ *     x軸 / y軸の比
+ *
+ */
+function getScale(el) {
+    var elRect = el.getBoundingClientRect();
+    return {
+      x: el.width / elRect.width,
+      y: el.height / elRect.height,
     };
 }
 
