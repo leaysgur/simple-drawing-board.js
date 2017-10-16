@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>SimpleDrawingBoard</title>
+  <style>
+    body {
+      text-align: center;
+      background-color: #eee;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+  <h1>SDB Examples</h1>
+  <!-- styleを指定 -->
+  <canvas style="width: 400px" id="c" width="800" height="450"></canvas>
+  <div>
+    <button onclick="sdb.clear()">消</button>
+    /
+    <button onclick="sdb.undo()">戻</button>
+    <button onclick="sdb.redo()">進</button>
+    /
+    <button onclick="sdb.setLineColor('#000')">黒</button>
+    <button onclick="sdb.setLineColor('#fff')">白</button>
+    <button onclick="sdb.setLineColor('#f00')">赤</button>
+    <button onclick="sdb.setLineColor('#0f0')">緑</button>
+    <button onclick="sdb.setLineColor('#00f')">青</button>
+    /
+    <button onclick="sdb.setLineSize(1)">細</button>
+    <button onclick="sdb.setLineSize(15)">中</button>
+    <button onclick="sdb.setLineSize(30)">太</button>
+    /
+    <button onclick="sdb.fill('#fff')">白塗</button>
+    <button onclick="sdb.fill('#000')">黒塗</button>
+  </div>
+
+  <script src="./simple-drawing-board.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>

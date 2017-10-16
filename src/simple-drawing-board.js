@@ -405,9 +405,12 @@ function _getInputCoords(ev) {
     // いつリサイズされてもよいようリアルタイムに
     this._elRect = Util.getAdjustedRect(this.el);
 
+    // canvasのstyle指定に対応するため
+    this._elScale = Util.getScale(this.el);
+
     return {
-        x: x - this._elRect.left,
-        y: y - this._elRect.top
+        x: (x - this._elRect.left) * this._elScale.x,
+        y: (y - this._elRect.top) * this._elScale.y
     };
 }
 /**
