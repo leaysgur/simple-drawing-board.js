@@ -31,9 +31,9 @@ function SimpleDrawingBoard(el, options) {
         isDrawMode:    null,
     };
     // 描画履歴
-    this._history   = {
-        items: null,
-        idx:   null
+    this._history = {
+        prev: new Util.Stack(), // undo用履歴
+        next: new Util.Stack(), // redo用履歴
     };
 
     this._initHistory();
@@ -110,10 +110,10 @@ function setLineColor(color) {
  *
  */
 function fill(color) {
+    this._saveHistory();
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this._saveHistory();
     return this;
 }
 /**
@@ -123,6 +123,7 @@ function fill(color) {
  */
 function clear() {
     var settings = this._settings;
+    this._saveHistory();
     // 透明なときは一手間
     if (settings.isTransparent) {
         var oldGCO = this.ctx.globalCompositeOperation;
@@ -135,7 +136,6 @@ function clear() {
         this.fill(this._settings.boardColor);
     }
 
-    this._saveHistory();
     return this;
 }
 /**
@@ -181,10 +181,16 @@ function getImg() {
  *     画像URLか、drawImageできる要素
  * @param {Boolean} isOverlay
  *     上に重ねるならtrue
+ * @param {Boolean} isSkipSaveHistory
+ *     履歴保存をスキップするならtrue（デフォルトfalse）
  *
  */
-function setImg(src, isOverlay) {
+function setImg(src, isOverlay, isSkipSaveHistory) {
     isOverlay = isOverlay || false;
+    isSkipSaveHistory = isSkipSaveHistory || false;
+    if (!isSkipSaveHistory) {
+        this._saveHistory();
+    }
 
     // imgUrl
     if (typeof src === 'string') {
@@ -195,7 +201,6 @@ function setImg(src, isOverlay) {
         this._setImgByDrawableEl(src, isOverlay);
     }
 
-    this._saveHistory();
     return this;
 }
 /**
@@ -268,7 +273,6 @@ function _initBoard(options) {
     this.ctx.lineCap = this.ctx.lineJoin = 'round';
     this.setLineSize(settings.lineSize);
     this.setLineColor(settings.lineColor);
-    this.clear();
 
     this._bindEvents();
     this._draw();
@@ -332,6 +336,7 @@ function _draw() {
  *
  */
 function _onInputDown(ev) {
+    this._saveHistory();
     this._isDrawing = 1;
 
     var coords = this._getInputCoords(ev);
@@ -351,8 +356,6 @@ function _onInputMove(ev) {
  */
 function _onInputUp() {
     this._isDrawing = 0;
-
-    this._saveHistory();
 }
 /**
  * いわゆるhandleEvent
@@ -477,8 +480,8 @@ function _setImgByDrawableEl(el, isOverlay) {
  */
 function _initHistory() {
     this._history = {
-        items: [],
-        idx:   0
+        prev: new Util.Stack(), // undo用履歴
+        next: new Util.Stack(), // redo用履歴
     };
 }
 /**
@@ -490,26 +493,20 @@ function _saveHistory() {
 
     // 最後の履歴と同じ結果なら保存しない
     var curImg  = this.getImg();
-    var lastImg = history.items[history.items.length - 1];
+    var lastImg = history.prev.get(history.prev.size() - 1);
     if (lastImg && curImg === lastImg) { return; }
 
     // 履歴には限度がある
-    while (history.items.length >= this._settings.historyDepth) {
-        history.items.shift();
-        history.idx--;
+    while (history.prev.size() >= this._settings.historyDepth) {
+        // 古い履歴から消していく
+        history.prev.shift();
     }
 
-    // undoしてると、idxとitemsがズレるので、それを補正してからセーブ
-    if (history.idx !== 0 && history.idx < history.items.length) {
-        history.items = history.items.slice(0, history.idx);
-        history.idx++;
-    }
     // 普通にセーブ
-    else {
-        history.idx = history.items.length + 1;
-    }
+    history.prev.push(curImg);
+    // redo用履歴はクリアする
+    history.next = new Util.Stack();
 
-    history.items.push(curImg);
     this.ev.trigger('save', curImg);
 }
 /**
@@ -521,17 +518,27 @@ function _saveHistory() {
  */
 function _restoreFromHistory(goForth) {
     var history = this._history;
-    // redoされても先がない場合 / undoされても前がない場合
-    if (( goForth && history.idx === history.items.length) ||
-        (!goForth && history.idx === 1)) {
+    var pushKey = 'next';
+    var popKey = 'prev';
+    if (goForth) {
+        // redoのときはnextからpopし、prevにpushする
+        pushKey = 'prev';
+        popKey = 'next';
+    }
+    var item = history[popKey].pop();
+    if (item == null) {
         return;
     }
 
-    var idx = goForth ? history.idx + 1 : history.idx - 1;
-    if (history.items.length && history.items[idx - 1] !== undefined) {
-        history.idx = idx;
-        this.setImg(history.items[idx - 1]);
+    // 最後の履歴と同じ結果なら保存しない
+    var curImg  = this.getImg();
+    var lastImg = history.next.get(history.next.size() - 1);
+    if (!lastImg || lastImg != curImg) {
+        history[pushKey].push(curImg);
     }
+
+    // この操作は履歴を保存しない
+    this.setImg(item, false, true);
 }
 
 // Export
