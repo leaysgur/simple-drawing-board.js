@@ -298,7 +298,7 @@ function _unbindEvents() {
  *     貼るならtrue
  */
 function _bindOrUnbindEvents(bind) {
-    var events = (Util.isTouch) ?
+    var events = (Util.isTouch()) ?
         ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'gesturestart'] :
         ['mousedown', 'mousemove', 'mouseup', 'mouseout'];
     var method = bind ? 'addEventListener' : 'removeEventListener';
@@ -397,7 +397,7 @@ function _handleEvent(ev) {
  */
 function _getInputCoords(ev) {
     var x, y;
-    if (Util.isTouch) {
+    if (Util.isTouch()) {
         x = ev.touches[0].pageX;
         y = ev.touches[0].pageY;
     } else {

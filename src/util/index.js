@@ -3,7 +3,7 @@ var Stack = require('./stack');
 
 var Util = {
     // 便利メソッドたち
-    isTouch:         (isTouch()),
+    isTouch:         isTouch,
     isTransparent:   isTransparent,
     isDrawableEl:    isDrawableEl,
     getAdjustedRect: getAdjustedRect,
