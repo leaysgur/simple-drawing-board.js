@@ -556,8 +556,62 @@ function _restoreFromHistory(goForth) {
 // Export
 module.exports = SimpleDrawingBoard;
 
-},{"./const":1,"./util":3}],3:[function(require,module,exports){
+},{"./const":1,"./util":4}],3:[function(require,module,exports){
+/**
+ * Minimal event interface
+ * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
+ *
+ */
+function Eve() {
+    this._events = {};
+}
+Eve.prototype = {
+    constructor: Eve,
+    on: function(evName, handler) {
+        var events = this._events;
+
+        if (!(evName in events)) {
+            events[evName] = [];
+        }
+        events[evName].push(handler);
+    },
+    off: function(evName, handler) {
+        var events = this._events;
+
+        if (!(evName in events)) {
+            return;
+        }
+        if (!handler) {
+            events[evName] = [];
+        }
+
+        var handlerIdx = events[evName].indexOf(handler);
+        if (handlerIdx >= 0) {
+            events[evName].splice(handlerIdx, 1);
+        }
+    },
+    trigger: function(evName, evData) {
+        var events = this._events,
+            handler;
+
+        if (!(evName in events)) { return; }
+
+        var i = 0, l = events[evName].length;
+        for (; i < l; i++) {
+            handler = events[evName][i];
+            handler.handleEvent ? handler.handleEvent.call(this, evData)
+                                : handler.call(this, evData);
+        }
+    }
+};
+
+module.exports = Eve;
+
+},{}],4:[function(require,module,exports){
 (function (global){
+var Eve = require('./eve');
+var Stack = require('./stack');
+
 var Util = {
     // 便利メソッドたち
     isTouch:         (isTouch()),
@@ -685,88 +739,43 @@ function cAF() {
             }).bind(global);
 }
 
-/**
- * Minimal event interface
- * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
- *
- */
-function Eve() {
-    this._events = {};
-}
-Eve.prototype = {
-    constructor: Eve,
-    on: function(evName, handler) {
-        var events = this._events;
+module.exports = Util;
 
-        if (!(evName in events)) {
-            events[evName] = [];
-        }
-        events[evName].push(handler);
-    },
-    off: function(evName, handler) {
-        var events = this._events;
-
-        if (!(evName in events)) {
-            return;
-        }
-        if (!handler) {
-            events[evName] = [];
-        }
-
-        var handlerIdx = events[evName].indexOf(handler);
-        if (handlerIdx >= 0) {
-            events[evName].splice(handlerIdx, 1);
-        }
-    },
-    trigger: function(evName, evData) {
-        var events = this._events,
-            handler;
-
-        if (!(evName in events)) { return; }
-
-        var i = 0, l = events[evName].length;
-        for (; i < l; i++) {
-            handler = events[evName][i];
-            handler.handleEvent ? handler.handleEvent.call(this, evData)
-                                : handler.call(this, evData);
-        }
-    }
-};
-
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./eve":3,"./stack":5}],5:[function(require,module,exports){
 /**
  * Stack Data Structure
  */
 function Stack() {
-	  this._items = [];
+  this._items = [];
 }
 
 Stack.prototype = {
-    constructor: Stack,
-    get: function(i) {
-        return this._items[i];
-    },
-    push: function(item) {
-	      this._items.push(item);
-    },
-    pop: function() {
-	      if (this._items.length > 0) {
-		        return this._items.pop();
-	      }
-	      return null;
-    },
-    shift: function() {
-        if (this._items.length > 0) {
-            return this._items.shift();
-        }
-        return null;
-    },
-    size: function() {
-	      return this._items.length;
+  constructor: Stack,
+  get: function(i) {
+    return this._items[i];
+  },
+  push: function(item) {
+    this._items.push(item);
+  },
+  pop: function() {
+    if (this._items.length > 0) {
+      return this._items.pop();
     }
+    return null;
+  },
+  shift: function() {
+    if (this._items.length > 0) {
+      return this._items.shift();
+    }
+    return null;
+  },
+  size: function() {
+    return this._items.length;
+  }
 };
 
-module.exports = Util;
+module.exports = Stack;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}]},{},[2])(2)
 });
