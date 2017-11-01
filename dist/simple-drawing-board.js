@@ -310,7 +310,7 @@ function _unbindEvents() {
  *     貼るならtrue
  */
 function _bindOrUnbindEvents(bind) {
-    var events = (Util.isTouch) ?
+    var events = (Util.isTouch()) ?
         ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'gesturestart'] :
         ['mousedown', 'mousemove', 'mouseup', 'mouseout'];
     var method = bind ? 'addEventListener' : 'removeEventListener';
@@ -409,7 +409,7 @@ function _handleEvent(ev) {
  */
 function _getInputCoords(ev) {
     var x, y;
-    if (Util.isTouch) {
+    if (Util.isTouch()) {
         x = ev.touches[0].pageX;
         y = ev.touches[0].pageY;
     } else {
@@ -614,7 +614,7 @@ var Stack = require('./stack');
 
 var Util = {
     // 便利メソッドたち
-    isTouch:         (isTouch()),
+    isTouch:         isTouch,
     isTransparent:   isTransparent,
     isDrawableEl:    isDrawableEl,
     getAdjustedRect: getAdjustedRect,
@@ -747,32 +747,32 @@ module.exports = Util;
  * Stack Data Structure
  */
 function Stack() {
-  this._items = [];
+    this._items = [];
 }
 
 Stack.prototype = {
-  constructor: Stack,
-  get: function(i) {
-    return this._items[i];
-  },
-  push: function(item) {
-    this._items.push(item);
-  },
-  pop: function() {
-    if (this._items.length > 0) {
-      return this._items.pop();
+    constructor: Stack,
+    get: function(i) {
+        return this._items[i];
+    },
+    push: function(item) {
+        this._items.push(item);
+    },
+    pop: function() {
+        if (this._items.length > 0) {
+            return this._items.pop();
+        }
+        return null;
+    },
+    shift: function() {
+        if (this._items.length > 0) {
+            return this._items.shift();
+        }
+        return null;
+    },
+    size: function() {
+        return this._items.length;
     }
-    return null;
-  },
-  shift: function() {
-    if (this._items.length > 0) {
-      return this._items.shift();
-    }
-    return null;
-  },
-  size: function() {
-    return this._items.length;
-  }
 };
 
 module.exports = Stack;
