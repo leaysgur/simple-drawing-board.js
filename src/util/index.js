@@ -79,8 +79,8 @@ function isDrawableEl(el) {
 function getAdjustedRect(el) {
     var elRect = el.getBoundingClientRect();
     return {
-      left: elRect.left + global.scrollX,
-      top:  elRect.top  + global.scrollY
+      left: elRect.left + global.pageXOffset,
+      top:  elRect.top  + global.pageYOffset,
     };
 }
 
