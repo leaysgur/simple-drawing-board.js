@@ -1,6 +1,6 @@
 {
   "name": "simple-drawing-board",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "Just simple minimal canvas drawing lib.",
   "main": "./src/simple-drawing-board.js",
   "scripts": {
