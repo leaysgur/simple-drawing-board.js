@@ -192,7 +192,7 @@ class SimpleDrawingBoard {
   dispose() {
     this._unbindEvents();
 
-    Util.cAF(this._timer);
+    cancelAnimationFrame(this._timer);
     this._timer = null;
 
     this._initHistory();
@@ -317,7 +317,7 @@ class SimpleDrawingBoard {
       this.ev.trigger("draw", this._coords.current);
     }
 
-    this._timer = Util.rAF(this._draw.bind(this));
+    this._timer = requestAnimationFrame(this._draw.bind(this));
   }
 
   /**

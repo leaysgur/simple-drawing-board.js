@@ -9,10 +9,6 @@ const Util = {
   getAdjustedRect: getAdjustedRect,
   getScale: getScale,
 
-  // shim
-  rAF: rAF(),
-  cAF: cAF(),
-
   // EA
   Eve: Eve,
 
@@ -101,36 +97,6 @@ function getScale(el) {
     x: el.width / elRect.width,
     y: el.height / elRect.height
   };
-}
-
-/**
- * requestAnimationFrameのshim
- *
- */
-function rAF() {
-  return (
-    window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    function(callback) {
-      window.setTimeout(callback, 1000 / 60);
-    }
-  ).bind(window);
-}
-
-/**
- * cancelAnimationFrameのshim
- *
- */
-function cAF() {
-  return (
-    window.cancelAnimationFrame ||
-    window.webkitCancelAnimationFrame ||
-    window.mozCancelAnimationFrame ||
-    function(callback) {
-      window.clearTimeout(callback);
-    }
-  ).bind(window);
 }
 
 export default Util;
