@@ -1,5 +1,8 @@
-var SimpleDrawingBoard = (function () {
-  'use strict';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = global || self, global.SimpleDrawingBoard = factory());
+}(this, function () { 'use strict';
 
   /**
    * Minimal event interface
@@ -226,7 +229,6 @@ var SimpleDrawingBoard = (function () {
   };
 
   function SimpleDrawingBoard(el, options) {
-    console.warn("AAA");
     // canvasの存在チェック
     this._ensureEl(el);
 
@@ -775,4 +777,4 @@ var SimpleDrawingBoard = (function () {
 
   return SimpleDrawingBoard;
 
-}());
+}));
