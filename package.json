@@ -2,7 +2,7 @@
   "name": "simple-drawing-board",
   "version": "2.0.0",
   "description": "Just simple minimal canvas drawing lib.",
-  "main": "./src/simple-drawing-board.js",
+  "main": "./dist/simple-drawing-board.js",
   "scripts": {
     "lint": "eslint .",
     "dev": "rollup -c --watch",
