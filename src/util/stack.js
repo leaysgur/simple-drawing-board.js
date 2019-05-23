@@ -28,6 +28,10 @@ class Stack {
     return null;
   }
 
+  clear() {
+    this._items.length = 0;
+  }
+
   size() {
     return this._items.length;
   }

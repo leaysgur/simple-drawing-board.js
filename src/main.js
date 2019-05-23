@@ -4,8 +4,9 @@ import Stack from "./util/stack";
 
 class SimpleDrawingBoard {
   constructor(el, options) {
-    // canvasの存在チェック
-    this._ensureEl(el);
+    if (!(el instanceof HTMLCanvasElement)) {
+      throw new Error("Pass canvas element as first argument.");
+    }
 
     this.ev = new Eve();
     this.el = el;
@@ -22,20 +23,21 @@ class SimpleDrawingBoard {
       current: { x: 0, y: 0 }
     };
     this._settings = {
-      lineColor: null,
-      lineSize: null,
-      boardColor: null,
-      historyDepth: null,
-      isTransparent: null,
-      isDrawMode: null
+      lineColor: "#aaa",
+      lineSize: 5,
+      boardColor: "transparent",
+      historyDepth: 10,
+      isTransparent: 1,
+      isDrawMode: 1
     };
     // 描画履歴
     this._history = {
-      prev: new Stack(), // undo用履歴
-      next: new Stack() // redo用履歴
+      // undo
+      prev: new Stack(),
+      // redo
+      next: new Stack()
     };
 
-    this._initHistory();
     this._initBoard(options);
   }
 
@@ -195,26 +197,10 @@ class SimpleDrawingBoard {
     cancelAnimationFrame(this._timer);
     this._timer = null;
 
-    this._initHistory();
+    this._history.prev.clear();
+    this._history.next.clear();
 
     this.ev.trigger("dispose");
-  }
-
-  /**
-   * canvasの存在を確かめる
-   *
-   * @param {HTMLCanvasElement} el
-   *     canvas要素
-   *
-   */
-  _ensureEl(el) {
-    if (
-      !el ||
-      typeof el !== "object" ||
-      el.tagName.toLowerCase() !== "canvas"
-    ) {
-      throw new Error("Pass canvas element as first argument.");
-    }
   }
 
   /**
@@ -226,12 +212,7 @@ class SimpleDrawingBoard {
    *
    */
   _initBoard(options) {
-    const settings = (this._settings = {
-      lineColor: "#aaa",
-      lineSize: 5,
-      boardColor: "transparent",
-      historyDepth: 10
-    });
+    const settings = this._settings;
 
     if (options) {
       for (const p in options) {
@@ -483,17 +464,6 @@ class SimpleDrawingBoard {
   }
 
   /**
-   * 履歴のオブジェクトを初期化
-   *
-   */
-  _initHistory() {
-    this._history = {
-      prev: new Stack(), // undo用履歴
-      next: new Stack() // redo用履歴
-    };
-  }
-
-  /**
    * 履歴に現在のボードを保存する
    *
    */
@@ -516,7 +486,7 @@ class SimpleDrawingBoard {
     // 普通にセーブ
     history.prev.push(curImg);
     // redo用履歴はクリアする
-    history.next = new Stack();
+    history.next.clear();
 
     this.ev.trigger("save", curImg);
   }
