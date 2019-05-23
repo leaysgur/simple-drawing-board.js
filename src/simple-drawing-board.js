@@ -1,6 +1,5 @@
-'use strict';
-var Util = require('./util');
-var Const = require('./const');
+const Util = require('./util');
+const Const = require('./const');
 
 function SimpleDrawingBoard(el, options) {
     // canvasの存在チェック
@@ -122,11 +121,11 @@ function fill(color) {
  *
  */
 function clear() {
-    var settings = this._settings;
+    const settings = this._settings;
     this._saveHistory();
     // 透明なときは一手間
     if (settings.isTransparent) {
-        var oldGCO = this.ctx.globalCompositeOperation;
+        const oldGCO = this.ctx.globalCompositeOperation;
         this.ctx.globalCompositeOperation = 'destination-out';
         this.fill(this._settings.boardColor);
         this.ctx.globalCompositeOperation = oldGCO;
@@ -143,7 +142,7 @@ function clear() {
  *
  */
 function toggleMode() {
-    var settings = this._settings;
+    const settings = this._settings;
     // 消す
     if (settings.isDrawMode) {
         this.setLineColor(settings.boardColor);
@@ -254,9 +253,9 @@ function _ensureEl(el) {
  *
  */
 function _initBoard(options) {
-    var settings = this._settings = Const.settings;
+    const settings = this._settings = Const.settings;
     if (options) {
-        for (var p in options) {
+        for (const p in options) {
             settings[p] = options[p];
         }
     }
@@ -298,12 +297,12 @@ function _unbindEvents() {
  *     貼るならtrue
  */
 function _bindOrUnbindEvents(bind) {
-    var events = (Util.isTouch()) ?
+    const events = (Util.isTouch()) ?
         ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'gesturestart'] :
         ['mousedown', 'mousemove', 'mouseup', 'mouseout'];
-    var method = bind ? 'addEventListener' : 'removeEventListener';
+    const method = bind ? 'addEventListener' : 'removeEventListener';
 
-    for (var i = 0, l = events.length; i < l; i++) {
+    for (let i = 0, l = events.length; i < l; i++) {
         this.el[method](events[i], this, false);
     }
 }
@@ -314,10 +313,10 @@ function _bindOrUnbindEvents(bind) {
  */
 function _draw() {
     // さっきと同じ場所なら書かなくていい
-    var isSameCoords = this._coords.old.x === this._coords.current.x &&
+    const isSameCoords = this._coords.old.x === this._coords.current.x &&
                        this._coords.old.y === this._coords.current.y;
     if (this._isDrawing && !isSameCoords) {
-        var currentMid = this._getMidInputCoords(this._coords.current);
+        const currentMid = this._getMidInputCoords(this._coords.current);
         this.ctx.beginPath();
         this.ctx.moveTo(currentMid.x, currentMid.y);
         this.ctx.quadraticCurveTo(this._coords.old.x, this._coords.old.y, this._coords.oldMid.x, this._coords.oldMid.y);
@@ -339,7 +338,7 @@ function _onInputDown(ev) {
     this._saveHistory();
     this._isDrawing = 1;
 
-    var coords = this._getInputCoords(ev);
+    const coords = this._getInputCoords(ev);
     this._coords.current = this._coords.old = coords;
     this._coords.oldMid  = this._getMidInputCoords(coords);
 }
@@ -384,6 +383,7 @@ function _handleEvent(ev) {
     case 'gesturestart':
         this._onInputUp();
         break;
+    default:
     }
 }
 /**
@@ -396,7 +396,7 @@ function _handleEvent(ev) {
  *
  */
 function _getInputCoords(ev) {
-    var x, y;
+    let x, y;
     if (Util.isTouch()) {
         x = ev.touches[0].pageX;
         y = ev.touches[0].pageY;
@@ -441,9 +441,9 @@ function _getMidInputCoords(coords) {
  *
  */
 function _setImgByImgSrc(src, isOverlay) {
-    var ctx    = this.ctx;
-    var oldGCO = ctx.globalCompositeOperation;
-    var img    = new Image();
+    const ctx    = this.ctx;
+    const oldGCO = ctx.globalCompositeOperation;
+    const img    = new Image();
 
     img.onload = function() {
         ctx.globalCompositeOperation = 'source-over';
@@ -466,8 +466,8 @@ function _setImgByImgSrc(src, isOverlay) {
 function _setImgByDrawableEl(el, isOverlay) {
     if (!Util.isDrawableEl(el)) { return; }
 
-    var ctx    = this.ctx;
-    var oldGCO = ctx.globalCompositeOperation;
+    const ctx    = this.ctx;
+    const oldGCO = ctx.globalCompositeOperation;
 
     ctx.globalCompositeOperation = 'source-over';
     isOverlay || ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -489,11 +489,11 @@ function _initHistory() {
  *
  */
 function _saveHistory() {
-    var history = this._history;
+    const history = this._history;
 
     // 最後の履歴と同じ結果なら保存しない
-    var curImg  = this.getImg();
-    var lastImg = history.prev.get(history.prev.size() - 1);
+    const curImg  = this.getImg();
+    const lastImg = history.prev.get(history.prev.size() - 1);
     if (lastImg && curImg === lastImg) { return; }
 
     // 履歴には限度がある
@@ -517,22 +517,22 @@ function _saveHistory() {
  *
  */
 function _restoreFromHistory(goForth) {
-    var history = this._history;
-    var pushKey = 'next';
-    var popKey = 'prev';
+    const history = this._history;
+    let pushKey = 'next';
+    let popKey = 'prev';
     if (goForth) {
         // redoのときはnextからpopし、prevにpushする
         pushKey = 'prev';
         popKey = 'next';
     }
-    var item = history[popKey].pop();
+    const item = history[popKey].pop();
     if (item == null) {
         return;
     }
 
     // 最後の履歴と同じ結果なら保存しない
-    var curImg  = this.getImg();
-    var lastImg = history.next.get(history.next.size() - 1);
+    const curImg  = this.getImg();
+    const lastImg = history.next.get(history.next.size() - 1);
     if (!lastImg || lastImg != curImg) {
         history[pushKey].push(curImg);
     }

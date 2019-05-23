@@ -1,7 +1,7 @@
-var Eve = require('./eve');
-var Stack = require('./stack');
+const Eve = require('./eve');
+const Stack = require('./stack');
 
-var Util = {
+const Util = {
     // 便利メソッドたち
     isTouch:         isTouch,
     isTransparent:   isTransparent,
@@ -41,7 +41,7 @@ function isTransparent(color) {
     color = color.replace(/\s/g, '');
     if (color === 'transparent')   { return true; }
 
-    var isRgbaOrHlsaTransparent = color.split(',')[3] === '0)';
+    const isRgbaOrHlsaTransparent = color.split(',')[3] === '0)';
     if (isRgbaOrHlsaTransparent) { return true; }
 
     return false;
@@ -57,7 +57,7 @@ function isTransparent(color) {
  *
  */
 function isDrawableEl(el) {
-    var isDrawable = [
+    const isDrawable = [
         'img',
         'canvas',
         'video'
@@ -77,7 +77,7 @@ function isDrawableEl(el) {
  *
  */
 function getAdjustedRect(el) {
-    var elRect = el.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
     return {
       left: elRect.left + global.pageXOffset,
       top:  elRect.top  + global.pageYOffset,
@@ -95,7 +95,7 @@ function getAdjustedRect(el) {
  *
  */
 function getScale(el) {
-    var elRect = el.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
     return {
       x: el.width / elRect.width,
       y: el.height / elRect.height,

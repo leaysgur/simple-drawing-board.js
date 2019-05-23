@@ -9,7 +9,7 @@ function Eve() {
 Eve.prototype = {
     constructor: Eve,
     on: function(evName, handler) {
-        var events = this._events;
+        const events = this._events;
 
         if (!(evName in events)) {
             events[evName] = [];
@@ -17,7 +17,7 @@ Eve.prototype = {
         events[evName].push(handler);
     },
     off: function(evName, handler) {
-        var events = this._events;
+        const events = this._events;
 
         if (!(evName in events)) {
             return;
@@ -26,20 +26,20 @@ Eve.prototype = {
             events[evName] = [];
         }
 
-        var handlerIdx = events[evName].indexOf(handler);
+        const handlerIdx = events[evName].indexOf(handler);
         if (handlerIdx >= 0) {
             events[evName].splice(handlerIdx, 1);
         }
     },
     trigger: function(evName, evData) {
-        var events = this._events,
-            handler;
+        const events = this._events;
 
         if (!(evName in events)) { return; }
 
-        var i = 0, l = events[evName].length;
+        let i = 0;
+        const l = events[evName].length;
         for (; i < l; i++) {
-            handler = events[evName][i];
+            const handler = events[evName][i];
             handler.handleEvent ? handler.handleEvent.call(this, evData)
                                 : handler.call(this, evData);
         }
