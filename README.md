@@ -1,15 +1,10 @@
 # simple-drawing-board.js
+
 Just simple minimal canvas drawing lib.
 
 - under 500 lines of codes
-- minimal functions for drawing
-- no dependencies
-- Mobile compatibility
-
-> You have to make your UIs by your own.
-
-[DEMO](https://leader22.github.io/simple-drawing-board.js/index.html)
-
+- 0 dependencies
+- mobile compatibility
 
 ## Install
 ```sh
@@ -29,16 +24,13 @@ or
 
 ```javascript
 // if installed by npm
-var SimpleDrawingBoard = require('simple-drawing-board');
+const SimpleDrawingBoard = require('simple-drawing-board');
 
-var sdb = new SimpleDrawingBoard(document.getElementById('canvas'));
-```
+const sdb = new SimpleDrawingBoard(document.getElementById('canvas'));
 
-That's all!
+// or
 
-### options
-```javascript
-var sdb = new SimpleDrawingBoard(document.getElementById('canvas'), {
+const sdb = new SimpleDrawingBoard(document.getElementById('canvas'), {
   lineColor:    '#000',
   lineSize:     5,
   boardColor:   'transparent',
