@@ -1,23 +1,23 @@
-const Eve = require('./eve');
-const Stack = require('./stack');
+const Eve = require("./eve");
+const Stack = require("./stack");
 
 const Util = {
-    // 便利メソッドたち
-    isTouch:         isTouch,
-    isTransparent:   isTransparent,
-    isDrawableEl:    isDrawableEl,
-    getAdjustedRect: getAdjustedRect,
-    getScale:        getScale,
+  // 便利メソッドたち
+  isTouch: isTouch,
+  isTransparent: isTransparent,
+  isDrawableEl: isDrawableEl,
+  getAdjustedRect: getAdjustedRect,
+  getScale: getScale,
 
-    // shim
-    rAF: (rAF()),
-    cAF: (cAF()),
+  // shim
+  rAF: rAF(),
+  cAF: cAF(),
 
-    // EA
-    Eve: Eve,
+  // EA
+  Eve: Eve,
 
-    // Stack
-    Stack: Stack,
+  // Stack
+  Stack: Stack
 };
 
 /**
@@ -27,7 +27,7 @@ const Util = {
  *     isTouchデバイス
  */
 function isTouch() {
-    return 'ontouchstart' in global.document;
+  return "ontouchstart" in global.document;
 }
 
 /**
@@ -38,13 +38,17 @@ function isTouch() {
  *     色
  */
 function isTransparent(color) {
-    color = color.replace(/\s/g, '');
-    if (color === 'transparent')   { return true; }
+  color = color.replace(/\s/g, "");
+  if (color === "transparent") {
+    return true;
+  }
 
-    const isRgbaOrHlsaTransparent = color.split(',')[3] === '0)';
-    if (isRgbaOrHlsaTransparent) { return true; }
+  const isRgbaOrHlsaTransparent = color.split(",")[3] === "0)";
+  if (isRgbaOrHlsaTransparent) {
+    return true;
+  }
 
-    return false;
+  return false;
 }
 
 /**
@@ -57,13 +61,10 @@ function isTransparent(color) {
  *
  */
 function isDrawableEl(el) {
-    const isDrawable = [
-        'img',
-        'canvas',
-        'video'
-    ].indexOf(el.tagName.toLowerCase()) !== -1;
+  const isDrawable =
+    ["img", "canvas", "video"].indexOf(el.tagName.toLowerCase()) !== -1;
 
-    return isDrawable;
+  return isDrawable;
 }
 
 /**
@@ -77,11 +78,11 @@ function isDrawableEl(el) {
  *
  */
 function getAdjustedRect(el) {
-    const elRect = el.getBoundingClientRect();
-    return {
-      left: elRect.left + global.pageXOffset,
-      top:  elRect.top  + global.pageYOffset,
-    };
+  const elRect = el.getBoundingClientRect();
+  return {
+    left: elRect.left + global.pageXOffset,
+    top: elRect.top + global.pageYOffset
+  };
 }
 
 /**
@@ -95,11 +96,11 @@ function getAdjustedRect(el) {
  *
  */
 function getScale(el) {
-    const elRect = el.getBoundingClientRect();
-    return {
-      x: el.width / elRect.width,
-      y: el.height / elRect.height,
-    };
+  const elRect = el.getBoundingClientRect();
+  return {
+    x: el.width / elRect.width,
+    y: el.height / elRect.height
+  };
 }
 
 /**
@@ -107,12 +108,14 @@ function getScale(el) {
  *
  */
 function rAF() {
-    return (global.requestAnimationFrame       ||
-            global.webkitRequestAnimationFrame ||
-            global.mozRequestAnimationFrame    ||
-            function(callback) {
-                global.setTimeout(callback, 1000 / 60);
-            }).bind(global);
+  return (
+    global.requestAnimationFrame ||
+    global.webkitRequestAnimationFrame ||
+    global.mozRequestAnimationFrame ||
+    function(callback) {
+      global.setTimeout(callback, 1000 / 60);
+    }
+  ).bind(global);
 }
 
 /**
@@ -120,12 +123,14 @@ function rAF() {
  *
  */
 function cAF() {
-    return (global.cancelAnimationFrame       ||
-            global.webkitCancelAnimationFrame ||
-            global.mozCancelAnimationFrame    ||
-            function(callback) {
-                global.clearTimeout(callback);
-            }).bind(global);
+  return (
+    global.cancelAnimationFrame ||
+    global.webkitCancelAnimationFrame ||
+    global.mozCancelAnimationFrame ||
+    function(callback) {
+      global.clearTimeout(callback);
+    }
+  ).bind(global);
 }
 
 module.exports = Util;

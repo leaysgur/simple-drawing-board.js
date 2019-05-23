@@ -4,6 +4,7 @@
   "description": "",
   "main": "./src/simple-drawing-board.js",
   "scripts": {
+    "lint": "eslint ./src",
     "build": "npm run _bundle && npm run _min && npm run _docs",
     "_bundle": "browserify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js",
     "_min": "uglifyjs ./dist/simple-drawing-board.js > ./dist/simple-drawing-board.min.js",
@@ -28,6 +29,10 @@
   "homepage": "https://github.com/leader22/simple-drawing-board.js",
   "devDependencies": {
     "browserify": "^13.1.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.17.1",
     "uglifyify": "^3.0.4",
     "watchify": "^3.7.0"
   }
