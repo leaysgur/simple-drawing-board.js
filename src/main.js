@@ -237,36 +237,23 @@ class SimpleDrawingBoard {
     this._draw();
   }
 
-  /**
-   * 基本的なイベントを貼る
-   *
-   */
   _bindEvents() {
-    this._bindOrUnbindEvents(true);
-  }
-
-  /**
-   * 基本的なイベントを剥がす
-   *
-   */
-  _unbindEvents() {
-    this._bindOrUnbindEvents(false);
-  }
-
-  /**
-   * 基本的なイベントを貼る / 剥がす
-   *
-   * @param {Boolean} bind
-   *     貼るならtrue
-   */
-  _bindOrUnbindEvents(bind) {
     const events = isTouch()
       ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
       : ["mousedown", "mousemove", "mouseup", "mouseout"];
-    const method = bind ? "addEventListener" : "removeEventListener";
 
     for (let i = 0, l = events.length; i < l; i++) {
-      this.el[method](events[i], this, false);
+      this.el.addEventListener(events[i], this, false);
+    }
+  }
+
+  _unbindEvents() {
+    const events = isTouch()
+      ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
+      : ["mousedown", "mousemove", "mouseup", "mouseout"];
+
+    for (let i = 0, l = events.length; i < l; i++) {
+      this.el.removeEventListener(events[i], this, false);
     }
   }
 
@@ -280,6 +267,7 @@ class SimpleDrawingBoard {
     const isSameCoords =
       this._coords.old.x === this._coords.current.x &&
       this._coords.old.y === this._coords.current.y;
+
     if (this._isDrawing && !isSameCoords) {
       const currentMid = this._getMidInputCoords(this._coords.current);
       this.ctx.beginPath();
