@@ -1,15 +1,12 @@
 {
   "name": "simple-drawing-board",
   "version": "1.4.1",
-  "description": "",
+  "description": "Just simple minimal canvas drawing lib.",
   "main": "./src/simple-drawing-board.js",
   "scripts": {
     "lint": "eslint .",
     "dev": "rollup -c --watch",
-    "build": "rollup -c",
-    "_build": "npm run _bundle && npm run _min && npm run _docs",
-    "_min": "uglifyjs ./dist/simple-drawing-board.js > ./dist/simple-drawing-board.min.js",
-    "_docs": "cp ./dist/simple-drawing-board.js ./docs"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
