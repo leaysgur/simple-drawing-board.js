@@ -1,33 +1,36 @@
 /**
  * Stack Data Structure
  */
-function Stack() {
-  this._items = [];
-}
+class Stack {
+  constructor() {
+    this._items = [];
+  }
 
-Stack.prototype = {
-  constructor: Stack,
-  get: function(i) {
+  get(i) {
     return this._items[i];
-  },
-  push: function(item) {
+  }
+
+  push(item) {
     this._items.push(item);
-  },
-  pop: function() {
+  }
+
+  pop() {
     if (this._items.length > 0) {
       return this._items.pop();
     }
     return null;
-  },
-  shift: function() {
+  }
+
+  shift() {
     if (this._items.length > 0) {
       return this._items.shift();
     }
     return null;
-  },
-  size: function() {
+  }
+
+  size() {
     return this._items.length;
   }
-};
+}
 
 export default Stack;

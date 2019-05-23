@@ -1,5 +1,4 @@
 import Util from "./util/index";
-import Const from "./const";
 
 function SimpleDrawingBoard(el, options) {
   // canvasの存在チェック
@@ -250,7 +249,13 @@ function _ensureEl(el) {
  *
  */
 function _initBoard(options) {
-  const settings = (this._settings = Const.settings);
+  const settings = (this._settings = {
+    lineColor: "#aaa",
+    lineSize: 5,
+    boardColor: "transparent",
+    historyDepth: 10
+  });
+
   if (options) {
     for (const p in options) {
       settings[p] = options[p];
