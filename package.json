@@ -4,12 +4,15 @@
   "description": "",
   "main": "./src/simple-drawing-board.js",
   "scripts": {
-    "lint": "eslint ./src",
-    "build": "npm run _bundle && npm run _min && npm run _docs",
+    "lint": "eslint .",
+    "dev": "rollup ./src/main.js -f iife -n SimpleDrawingBoard -o ./dist/simple-drawing-board.js --watch",
+    "build": "rollup ./src/main.js -f iife -n SimpleDrawingBoard -o ./dist/simple-drawing-board.js",
+
+    "_build": "npm run _bundle && npm run _min && npm run _docs",
     "_bundle": "browserify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js",
     "_min": "uglifyjs ./dist/simple-drawing-board.js > ./dist/simple-drawing-board.min.js",
     "_docs": "cp ./dist/simple-drawing-board.js ./docs",
-    "dev": "watchify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js"
+    "_dev": "watchify ./src/simple-drawing-board.js -s SimpleDrawingBoard -o ./dist/simple-drawing-board.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +36,7 @@
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.0",
     "prettier": "^1.17.1",
+    "rollup": "^1.12.3",
     "uglifyify": "^3.0.4",
     "watchify": "^3.7.0"
   }

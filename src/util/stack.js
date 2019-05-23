@@ -30,4 +30,4 @@ Stack.prototype = {
   }
 };
 
-module.exports = Stack;
+export default Stack;

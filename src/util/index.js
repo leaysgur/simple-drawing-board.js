@@ -1,5 +1,5 @@
-const Eve = require("./eve");
-const Stack = require("./stack");
+import Eve from "./eve";
+import Stack from "./stack";
 
 const Util = {
   // 便利メソッドたち
@@ -27,7 +27,7 @@ const Util = {
  *     isTouchデバイス
  */
 function isTouch() {
-  return "ontouchstart" in global.document;
+  return "ontouchstart" in window.document;
 }
 
 /**
@@ -80,8 +80,8 @@ function isDrawableEl(el) {
 function getAdjustedRect(el) {
   const elRect = el.getBoundingClientRect();
   return {
-    left: elRect.left + global.pageXOffset,
-    top: elRect.top + global.pageYOffset
+    left: elRect.left + window.pageXOffset,
+    top: elRect.top + window.pageYOffset
   };
 }
 
@@ -109,13 +109,13 @@ function getScale(el) {
  */
 function rAF() {
   return (
-    global.requestAnimationFrame ||
-    global.webkitRequestAnimationFrame ||
-    global.mozRequestAnimationFrame ||
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
     function(callback) {
-      global.setTimeout(callback, 1000 / 60);
+      window.setTimeout(callback, 1000 / 60);
     }
-  ).bind(global);
+  ).bind(window);
 }
 
 /**
@@ -124,13 +124,13 @@ function rAF() {
  */
 function cAF() {
   return (
-    global.cancelAnimationFrame ||
-    global.webkitCancelAnimationFrame ||
-    global.mozCancelAnimationFrame ||
+    window.cancelAnimationFrame ||
+    window.webkitCancelAnimationFrame ||
+    window.mozCancelAnimationFrame ||
     function(callback) {
-      global.clearTimeout(callback);
+      window.clearTimeout(callback);
     }
-  ).bind(global);
+  ).bind(window);
 }
 
-module.exports = Util;
+export default Util;

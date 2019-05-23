@@ -1,5 +1,5 @@
-const Util = require("./util");
-const Const = require("./const");
+import Util from "./util/index";
+import Const from "./const";
 
 function SimpleDrawingBoard(el, options) {
   // canvasの存在チェック
@@ -548,5 +548,4 @@ function _restoreFromHistory(goForth) {
   this.setImg(item, false, true);
 }
 
-// Export
-module.exports = SimpleDrawingBoard;
+export default SimpleDrawingBoard;

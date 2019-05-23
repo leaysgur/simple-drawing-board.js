@@ -49,4 +49,4 @@ Eve.prototype = {
   }
 };
 
-module.exports = Eve;
+export default Eve;

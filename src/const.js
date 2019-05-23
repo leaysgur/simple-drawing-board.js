@@ -1,5 +1,4 @@
-// THE 定数
-module.exports = {
+export default {
   settings: {
     lineColor: "#aaa",
     lineSize: 5,
