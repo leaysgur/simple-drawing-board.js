@@ -1,16 +1,16 @@
-import Util from "./util/index";
+import { isTouch, isTransparent, isDrawableEl } from "./util/index";
+import Eve from "./util/eve";
+import Stack from "./util/stack";
 
 class SimpleDrawingBoard {
   constructor(el, options) {
     // canvasの存在チェック
     this._ensureEl(el);
 
-    this.ev = new Util.Eve();
+    this.ev = new Eve();
     this.el = el;
     this.ctx = el.getContext("2d");
 
-    // 座標補正のため
-    this._elRect = { left: 0, top: 0 };
     // trueの時だけstrokeされる
     this._isDrawing = 0;
     // 描画用のタイマー
@@ -31,8 +31,8 @@ class SimpleDrawingBoard {
     };
     // 描画履歴
     this._history = {
-      prev: new Util.Stack(), // undo用履歴
-      next: new Util.Stack() // redo用履歴
+      prev: new Stack(), // undo用履歴
+      next: new Stack() // redo用履歴
     };
 
     this._initHistory();
@@ -240,7 +240,7 @@ class SimpleDrawingBoard {
     }
 
     // 透過な時は消すモードで一手間必要になる
-    if (Util.isTransparent(settings.boardColor)) {
+    if (isTransparent(settings.boardColor)) {
       settings.boardColor = "rgba(0,0,0,1)";
       settings.isTransparent = 1;
     }
@@ -279,7 +279,7 @@ class SimpleDrawingBoard {
    *     貼るならtrue
    */
   _bindOrUnbindEvents(bind) {
-    const events = Util.isTouch()
+    const events = isTouch()
       ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
       : ["mousedown", "mousemove", "mouseup", "mouseout"];
     const method = bind ? "addEventListener" : "removeEventListener";
@@ -391,7 +391,7 @@ class SimpleDrawingBoard {
    */
   _getInputCoords(ev) {
     let x, y;
-    if (Util.isTouch()) {
+    if (isTouch()) {
       x = ev.touches[0].pageX;
       y = ev.touches[0].pageY;
     } else {
@@ -400,14 +400,22 @@ class SimpleDrawingBoard {
     }
 
     // いつリサイズされてもよいようリアルタイムに
-    this._elRect = Util.getAdjustedRect(this.el);
+    const elBCRect = this.el.getBoundingClientRect();
 
-    // canvasのstyle指定に対応するため
-    this._elScale = Util.getScale(this.el);
+    // スクロールされた状態でリロードすると、位置ズレするので加味する
+    const elRect = {
+      left: elBCRect.left + window.pageXOffset,
+      top: elBCRect.top + window.pageYOffset
+    };
+    // canvasのstyle指定に対応する
+    const elScale = {
+      x: this.el.width / elBCRect.width,
+      y: this.el.height / elBCRect.height
+    };
 
     return {
-      x: (x - this._elRect.left) * this._elScale.x,
-      y: (y - this._elRect.top) * this._elScale.y
+      x: (x - elRect.left) * elScale.x,
+      y: (y - elRect.top) * elScale.y
     };
   }
 
@@ -461,7 +469,7 @@ class SimpleDrawingBoard {
    *
    */
   _setImgByDrawableEl(el, isOverlay) {
-    if (!Util.isDrawableEl(el)) {
+    if (!isDrawableEl(el)) {
       return;
     }
 
@@ -480,8 +488,8 @@ class SimpleDrawingBoard {
    */
   _initHistory() {
     this._history = {
-      prev: new Util.Stack(), // undo用履歴
-      next: new Util.Stack() // redo用履歴
+      prev: new Stack(), // undo用履歴
+      next: new Stack() // redo用履歴
     };
   }
 
@@ -508,7 +516,7 @@ class SimpleDrawingBoard {
     // 普通にセーブ
     history.prev.push(curImg);
     // redo用履歴はクリアする
-    history.next = new Util.Stack();
+    history.next = new Stack();
 
     this.ev.trigger("save", curImg);
   }
