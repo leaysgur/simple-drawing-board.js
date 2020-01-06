@@ -4,7 +4,7 @@
   "description": "Just simple minimal canvas drawing lib.",
   "main": "./dist/simple-drawing-board.js",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint ./src/**/*",
     "dev": "rollup -c --watch",
     "build": "rollup -c"
   },
@@ -25,11 +25,11 @@
   },
   "homepage": "https://github.com/leader22/simple-drawing-board.js",
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.3.0",
-    "eslint-plugin-prettier": "^3.1.0",
-    "prettier": "^1.17.1",
-    "rollup": "^1.12.3",
-    "rollup-plugin-terser": "^5.0.0"
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "prettier": "^1.19.1",
+    "rollup": "^1.28.0",
+    "rollup-plugin-terser": "^5.1.3"
   }
 }
