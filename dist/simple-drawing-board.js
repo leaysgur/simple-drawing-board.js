@@ -2,7 +2,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = global || self, global.SimpleDrawingBoard = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
   /**
    * touchデバイス or NOT
@@ -485,7 +485,6 @@
         case "gesturestart":
           this._onInputUp();
           break;
-        default:
       }
     }
 
@@ -654,4 +653,4 @@
 
   return SimpleDrawingBoard;
 
-}));
+})));

@@ -1,9 +1,8 @@
 (function(global, undefined) {
-  'use strict';
+  "use strict";
 
-  var SimpleDrawingBoard = global.SimpleDrawingBoard;
+  const SimpleDrawingBoard = global.SimpleDrawingBoard;
 
-  var c = document.getElementById('c');
+  const c = document.getElementById("c");
   global.sdb = new SimpleDrawingBoard(c);
-
-}(window));
+})(window);
