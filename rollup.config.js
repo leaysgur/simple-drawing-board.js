@@ -5,8 +5,8 @@ const config = {
   output: {
     file: "./dist/simple-drawing-board.js",
     format: "umd",
-    name: "SimpleDrawingBoard"
-  }
+    name: "SimpleDrawingBoard",
+  },
 };
 
 const minConfig = JSON.parse(JSON.stringify(config));
