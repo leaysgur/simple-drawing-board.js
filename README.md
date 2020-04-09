@@ -2,9 +2,9 @@
 
 Just simple minimal canvas drawing lib.
 
-- under 500 lines of codes
 - 0 dependencies
-- mobile compatibility
+- Mobile browser, IE11 compatibility
+- Only 4.4KB(gzip)
 
 ## Install
 ```sh
@@ -23,13 +23,9 @@ or
 ```
 
 ```javascript
-// if installed by npm
-const SimpleDrawingBoard = require('simple-drawing-board');
-
 const sdb = new SimpleDrawingBoard(document.getElementById('canvas'));
 
-// or
-
+// w/ options
 const sdb = new SimpleDrawingBoard(document.getElementById('canvas'), {
   lineColor:    '#000',
   lineSize:     5,
@@ -120,9 +116,9 @@ sdb.ev.on('save', function(curImg) {
 });
 ```
 
-## Alternate
+## Alternatives
 - [Fabric.js](https://github.com/kangax/fabric.js): More and more functions and utils.
-- [drawingboard.js](https://github.com/Leimi/drawingboard.js): Go with jQuery.
+- [drawingboard.js](https://github.com/Leimi/drawingboard.js): With jQuery.
 
 ## License
 MIT
