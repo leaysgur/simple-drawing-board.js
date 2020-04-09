@@ -268,7 +268,7 @@ class SimpleDrawingBoard {
       this._coords.old.x === this._coords.current.x &&
       this._coords.old.y === this._coords.current.y;
 
-    if (this._isDrawing && !isSameCoords) {
+    if (this._isDrawing) {
       const currentMid = this._getMidInputCoords(this._coords.current);
       this.ctx.beginPath();
       this.ctx.moveTo(currentMid.x, currentMid.y);
@@ -283,7 +283,7 @@ class SimpleDrawingBoard {
       this._coords.old = this._coords.current;
       this._coords.oldMid = currentMid;
 
-      this.ev.trigger("draw", this._coords.current);
+      if (!isSameCoords) this.ev.trigger("draw", this._coords.current);
     }
 
     this._timer = requestAnimationFrame(this._draw.bind(this));
@@ -300,6 +300,8 @@ class SimpleDrawingBoard {
     const coords = this._getInputCoords(ev);
     this._coords.current = this._coords.old = coords;
     this._coords.oldMid = this._getMidInputCoords(coords);
+
+    this.ev.trigger("drawBegin", this._coords.current);
   }
 
   /**
@@ -316,6 +318,7 @@ class SimpleDrawingBoard {
    */
   _onInputUp() {
     this._isDrawing = 0;
+    this.ev.trigger("drawEnd", this._coords.current);
   }
 
   /**
