@@ -107,7 +107,13 @@ sdb.ev.on('dispose', function() {
     console.log('Do something on dispose.');
 });
 
+sdb.ev.on('drawBegin', function(coords) {
+    console.log(coords.x, coords.y);
+});
 sdb.ev.on('draw', function(coords) {
+    console.log(coords.x, coords.y);
+});
+sdb.ev.on('drawEnd', function(coords) {
     console.log(coords.x, coords.y);
 });
 
