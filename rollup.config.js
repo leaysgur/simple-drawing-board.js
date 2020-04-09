@@ -1,7 +1,7 @@
 import { terser } from "rollup-plugin-terser";
 
 const config = {
-  input: "./src/main.js",
+  input: "./src/index.js",
   output: {
     file: "./dist/simple-drawing-board.js",
     format: "umd",
