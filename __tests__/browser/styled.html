@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-  <title>SimpleDrawingBoard</title>
+  <title>SimpleDrawingBoard TEST</title>
   <style>
     body {
       text-align: center;
@@ -16,9 +16,10 @@
   </style>
 </head>
 <body>
-  <h1>SDB Examples</h1>
+  <p>It should work w/ styled canvas</p>
+  <p>It should work w/ scrolled</p>
   <!-- styleを指定 -->
-  <canvas style="width: 400px" id="c" width="800" height="450"></canvas>
+  <canvas style="width: 400px; height: 1200px" id="c" width="800" height="2400"></canvas>
   <div>
     <button onclick="sdb.clear()">消</button>
     /
@@ -26,20 +27,19 @@
     <button onclick="sdb.redo()">進</button>
     /
     <button onclick="sdb.setLineColor('#000')">黒</button>
-    <button onclick="sdb.setLineColor('#fff')">白</button>
-    <button onclick="sdb.setLineColor('#f00')">赤</button>
-    <button onclick="sdb.setLineColor('#0f0')">緑</button>
     <button onclick="sdb.setLineColor('#00f')">青</button>
     /
     <button onclick="sdb.setLineSize(1)">細</button>
-    <button onclick="sdb.setLineSize(15)">中</button>
     <button onclick="sdb.setLineSize(30)">太</button>
     /
     <button onclick="sdb.fill('#fff')">白塗</button>
     <button onclick="sdb.fill('#000')">黒塗</button>
   </div>
 
-  <script src="./simple-drawing-board.js"></script>
-  <script src="./main.js"></script>
+  <script src="../../dist/simple-drawing-board.js"></script>
+  <script>
+    const c = document.getElementById("c");
+    window.sdb = new window.SimpleDrawingBoard(c);
+  </script>
 </body>
 </html>
