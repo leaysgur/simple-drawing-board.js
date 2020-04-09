@@ -461,6 +461,13 @@
       this.ev.trigger("drawEnd", this._coords.current);
     }
 
+    _onInputCancel() {
+      if (this._isDrawing) {
+        this.ev.trigger("drawEnd", this._coords.current);
+      }
+      this._isDrawing = 0;
+    }
+
     /**
      * いわゆるhandleEvent
      *
@@ -482,11 +489,13 @@
           this._onInputMove(ev);
           break;
         case "mouseup":
-        case "mouseout":
         case "touchend":
+          this._onInputUp();
+          break;
+        case "mouseout":
         case "touchcancel":
         case "gesturestart":
-          this._onInputUp();
+          this._onInputCancel();
           break;
       }
     }
