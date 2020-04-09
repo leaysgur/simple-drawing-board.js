@@ -26,8 +26,9 @@
 
   <script src="../../dist/simple-drawing-board.js"></script>
   <script>
+    const { create } = window.SimpleDrawingBoard;
     const c = document.getElementById("c");
-    window.sdb = new window.SimpleDrawingBoard(c);
+    window.sdb = create(c);
     window.sdb.ev.on("drawBegin", () => console.log("begin"));
     window.sdb.ev.on("draw", () => console.log("drawing"));
     window.sdb.ev.on("drawEnd", () => console.log("end"));

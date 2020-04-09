@@ -11,6 +11,7 @@
     }
     canvas {
       border: 1px solid #ccc;
+      background-color: lightblue;
       cursor: crosshair;
     }
   </style>
@@ -38,8 +39,9 @@
 
   <script src="../../dist/simple-drawing-board.js"></script>
   <script>
+    const { create } = window.SimpleDrawingBoard;
     const c = document.getElementById("c");
-    window.sdb = new window.SimpleDrawingBoard(c);
+    window.sdb = create(c, { historyDepth: 2 });
   </script>
 </body>
 </html>
