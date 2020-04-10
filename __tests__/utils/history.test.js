@@ -1,6 +1,13 @@
 import { History } from "../../src/utils/history";
 
 describe("History", () => {
+  it("should apply initialValue", () => {
+    const history = new History();
+    expect(history.value).toBe(null);
+    const history2 = new History(0);
+    expect(history2.value).toBe(0);
+  });
+
   it("should save", () => {
     const history = new History();
     expect(history.value).toBe(null);
@@ -79,5 +86,14 @@ describe("History", () => {
     history.save(10);
     history.redo();
     expect(history.value).toBe(10);
+  });
+
+  it("should clear", () => {
+    const history = new History();
+    history.save(1);
+    history.save(2);
+    history.clear();
+    history.undo();
+    expect(history.value).toBe(2);
   });
 });

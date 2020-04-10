@@ -1,16 +1,13 @@
 /**
  *
  * History for undo/redo Structure
- *
- *     past: [0, 1, 2, 3, 4, 5, 6, 7],
- *  present: 8,
- *   future: [9, 10]
+ * See `https://gist.github.com/leader22/9fbed07106d652ef40fda702da4f39c4`
  *
  */
 export class History {
-  constructor(initialValue) {
+  constructor(initialValue = null) {
     this._past = [];
-    this._present = initialValue || null;
+    this._present = initialValue;
     this._future = [];
   }
 
@@ -44,5 +41,10 @@ export class History {
     this._past = [...this._past, this._present];
     this._future = [];
     this._present = newPresent;
+  }
+
+  clear() {
+    this._past.length = 0;
+    this._future.length = 0;
   }
 }
