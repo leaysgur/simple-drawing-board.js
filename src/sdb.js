@@ -1,6 +1,20 @@
 import { Eve } from "./utils/eve";
 import { History } from "./utils/history";
-import { isTouch } from "./utils/utils";
+import { isTouch, isDrawableElement } from "./utils/utils";
+function isBase64DataURL(url) {
+  if (typeof url !== "string") return false;
+  if (!url.startsWith("data:image/")) return false;
+  return true;
+}
+
+async function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onerror = reject;
+    img.onload = () => resolve(img);
+    img.src = src;
+  });
+}
 
 export class SimpleDrawingBoard {
   constructor($el) {
@@ -23,9 +37,10 @@ export class SimpleDrawingBoard {
     };
 
     this._ev = new Eve();
-    this._history = new History();
+    this._history = new History(this.toDataURL());
 
     this._bindEvents();
+    // TODO: rename
     this._drawFrame();
   }
 
@@ -46,22 +61,21 @@ export class SimpleDrawingBoard {
   }
 
   fill(color) {
-    // TODO
-    // this._saveHistory();
-
     const ctx = this._ctx;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    this._saveHistory();
 
     return this;
   }
 
   clear() {
-    // TODO
-    // this._saveHistory();
-
     const ctx = this._ctx;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    this._saveHistory();
 
     return this;
   }
@@ -75,14 +89,60 @@ export class SimpleDrawingBoard {
     return this;
   }
 
-  getImageDataURL({ type, quality } = {}) {
+  toDataURL({ type, quality } = {}) {
     return this._ctx.canvas.toDataURL(type, quality);
   }
-  // TODO: name
-  setImg() {}
 
-  async undo() {}
-  async redo() {}
+  setImageByElement($el) {
+    if (!isDrawableElement($el))
+      throw new TypeError("Passed element is not a drawable!");
+
+    const ctx = this._ctx;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage($el, 0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    this._saveHistory();
+  }
+
+  async setImageByDataURL(src) {
+    if (!isBase64DataURL(src))
+      throw new TypeError("Passed src is not a base64 data URL!");
+
+    const img = await loadImage(src);
+
+    const ctx = this._ctx;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    this._saveHistory();
+  }
+
+  async undo() {
+    this._history.undo();
+
+    const base64 = this._history.value;
+    if (!isBase64DataURL(base64)) return;
+
+    const img = await loadImage(base64);
+
+    const ctx = this._ctx;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
+  async redo() {
+    this._history.redo();
+
+    const base64 = this._history.value;
+    if (!isBase64DataURL(base64)) return;
+
+    const img = await loadImage(base64);
+
+    const ctx = this._ctx;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
   dispose() {}
 
   handleEvent(ev) {
@@ -159,8 +219,6 @@ export class SimpleDrawingBoard {
   }
 
   _onInputDown(ev) {
-    // TODO
-    // this._saveHistory();
     this._isDrawing = true;
 
     const coords = this._getInputCoords(ev);
@@ -169,18 +227,29 @@ export class SimpleDrawingBoard {
 
     this._ev.trigger("drawBegin", this._coords.current);
   }
+
   _onInputMove(ev) {
     this._coords.current = this._getInputCoords(ev);
   }
+
   _onInputUp() {
     this._isDrawing = false;
     this._ev.trigger("drawEnd", this._coords.current);
+    this._saveHistory();
   }
+
   _onInputCancel() {
     if (this._isDrawing) {
       this._ev.trigger("drawEnd", this._coords.current);
+      this._saveHistory();
     }
     this._isDrawing = false;
+  }
+
+  _saveHistory() {
+    const curImg = this.toDataURL();
+    this._history.save(curImg);
+    this._ev.trigger("save", curImg);
   }
 
   // TODO: just function

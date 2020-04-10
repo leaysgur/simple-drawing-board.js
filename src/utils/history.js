@@ -8,9 +8,9 @@
  *
  */
 export class History {
-  constructor() {
+  constructor(initialValue) {
     this._past = [];
-    this._present = null;
+    this._present = initialValue || null;
     this._future = [];
   }
 
