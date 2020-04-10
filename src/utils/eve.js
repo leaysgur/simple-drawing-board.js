@@ -48,4 +48,8 @@ export class Eve {
         : handler.call(this, evData);
     }
   }
+
+  removeAllListeners() {
+    this._events = {};
+  }
 }

@@ -37,6 +37,16 @@ describe("Eve", () => {
     done();
   });
 
+  it("should not fire event multiple", (done) => {
+    const ev = new Eve();
+    ev.on("bye", done.fail);
+    ev.on("byebye", done.fail);
+    ev.removeAllListeners();
+    ev.trigger("bye");
+    ev.trigger("byebye");
+    done();
+  });
+
   it("should fire event again", (done) => {
     const ev = new Eve();
     ev.on("bye", done.fail);
