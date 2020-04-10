@@ -1,9 +1,9 @@
 import { Eve } from "./utils/eve";
-import { Stack } from "./utils/stack";
+import { History } from "./utils/history";
 import { isTouch } from "./utils/utils";
 
 export class SimpleDrawingBoard {
-  constructor($el, { historyDepth }) {
+  constructor($el) {
     this._$el = $el;
     this._ctx = this._$el.getContext("2d");
 
@@ -23,12 +23,7 @@ export class SimpleDrawingBoard {
     };
 
     this._ev = new Eve();
-    this._history = {
-      // for undo
-      prev: new Stack({ depth: historyDepth }),
-      // for redo
-      next: new Stack({ depth: historyDepth }),
-    };
+    this._history = new History();
 
     this._bindEvents();
     this._drawFrame();
