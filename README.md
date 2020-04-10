@@ -4,7 +4,7 @@ Just simple minimal canvas drawing lib.
 
 - 0 dependencies
 - Modern browser compatibility
-- Just 500 lines
+- Under 500 lines of code
 
 > For `v2.x` users
 > See https://github.com/leader22/simple-drawing-board.js/tree/v2.1.1
@@ -25,19 +25,24 @@ or
 ```
 
 ## How to use
+
+Prepare your `canvas` element.
+
 ```html
 <canvas id="canvas" width="500" height="300"></canvas>
 ```
 
+Then create drawing board.
+
 ```javascript
 import { create } from "simple-drawing-board.js";
 
-const sdb =  create(document.getElementById("canvas"));
+const sdb = create(document.getElementById("canvas"));
 ```
 
 ## APIs
 
-See also type definitions.
+See also [type definitions](./sdb.d.ts).
 
 ### setLineSize()
 ```js
@@ -85,17 +90,17 @@ sdb.setImageByElement(document.getElementById("img"));
 ```
 
 
-### setImageByDataURL()
+### async setImageByDataURL()
 ```js
 await sdb.setImageByDataURL("data:image/png;base64,xxxxxx....");
 ```
 
-### undo()
+### async undo()
 ```js
 await sdb.undo();
 ```
 
-### redo()
+### async redo()
 ```js
 await sdb.redo();
 ```
