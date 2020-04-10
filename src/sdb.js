@@ -1,20 +1,13 @@
 import { Eve } from "./utils/eve";
 import { History } from "./utils/history";
-import { isTouch, isDrawableElement } from "./utils/utils";
-function isBase64DataURL(url) {
-  if (typeof url !== "string") return false;
-  if (!url.startsWith("data:image/")) return false;
-  return true;
-}
-
-async function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onerror = reject;
-    img.onload = () => resolve(img);
-    img.src = src;
-  });
-}
+import {
+  isTouch,
+  isDrawableElement,
+  isBase64DataURL,
+  loadImage,
+  getMidInputCoords,
+  getInputCoords,
+} from "./utils/dom";
 
 export class SimpleDrawingBoard {
   constructor($el) {
@@ -40,11 +33,10 @@ export class SimpleDrawingBoard {
     this._history = new History(this.toDataURL());
 
     this._bindEvents();
-    // TODO: rename
     this._drawFrame();
   }
 
-  get ev() {
+  get observer() {
     return this._ev;
   }
 
@@ -119,7 +111,6 @@ export class SimpleDrawingBoard {
 
   async undo() {
     this._history.undo();
-
     const base64 = this._history.value;
     if (!isBase64DataURL(base64)) return;
 
@@ -132,7 +123,6 @@ export class SimpleDrawingBoard {
 
   async redo() {
     this._history.redo();
-
     const base64 = this._history.value;
     if (!isBase64DataURL(base64)) return;
 
@@ -143,7 +133,15 @@ export class SimpleDrawingBoard {
     ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
   }
 
-  dispose() {}
+  destroy() {
+    this._unbindEvents();
+
+    this._ev.removeAllListeners();
+    this._history.clear();
+
+    cancelAnimationFrame(this._timer);
+    this._timer = null;
+  }
 
   handleEvent(ev) {
     ev.preventDefault();
@@ -199,7 +197,10 @@ export class SimpleDrawingBoard {
       this._coords.old.x === this._coords.current.x &&
       this._coords.old.y === this._coords.current.y;
 
-    const currentMid = this._getMidInputCoords(this._coords.current);
+    const currentMid = getMidInputCoords(
+      this._coords.old,
+      this._coords.current
+    );
     const ctx = this._ctx;
 
     ctx.beginPath();
@@ -221,21 +222,22 @@ export class SimpleDrawingBoard {
   _onInputDown(ev) {
     this._isDrawing = true;
 
-    const coords = this._getInputCoords(ev);
+    const coords = getInputCoords(ev, this._$el);
     this._coords.current = this._coords.old = coords;
-    this._coords.oldMid = this._getMidInputCoords(coords);
+    this._coords.oldMid = getMidInputCoords(this._coords.old, coords);
 
     this._ev.trigger("drawBegin", this._coords.current);
   }
 
   _onInputMove(ev) {
-    this._coords.current = this._getInputCoords(ev);
+    this._coords.current = getInputCoords(ev, this._$el);
   }
 
   _onInputUp() {
-    this._isDrawing = false;
     this._ev.trigger("drawEnd", this._coords.current);
     this._saveHistory();
+
+    this._isDrawing = false;
   }
 
   _onInputCancel() {
@@ -243,49 +245,12 @@ export class SimpleDrawingBoard {
       this._ev.trigger("drawEnd", this._coords.current);
       this._saveHistory();
     }
+
     this._isDrawing = false;
   }
 
   _saveHistory() {
-    const curImg = this.toDataURL();
-    this._history.save(curImg);
-    this._ev.trigger("save", curImg);
-  }
-
-  // TODO: just function
-  _getInputCoords(ev) {
-    let x, y;
-    if (isTouch()) {
-      x = ev.touches[0].pageX;
-      y = ev.touches[0].pageY;
-    } else {
-      x = ev.pageX;
-      y = ev.pageY;
-    }
-
-    // いつリサイズされてもよいようリアルタイムに
-    const elBCRect = this._$el.getBoundingClientRect();
-
-    // スクロールされた状態でリロードすると、位置ズレするので加味する
-    const elRect = {
-      left: elBCRect.left + window.pageXOffset,
-      top: elBCRect.top + window.pageYOffset,
-    };
-    // canvasのstyle指定に対応する
-    const elScale = {
-      x: this._$el.width / elBCRect.width,
-      y: this._$el.height / elBCRect.height,
-    };
-
-    return {
-      x: (x - elRect.left) * elScale.x,
-      y: (y - elRect.top) * elScale.y,
-    };
-  }
-  _getMidInputCoords(coords) {
-    return {
-      x: (this._coords.old.x + coords.x) >> 1,
-      y: (this._coords.old.y + coords.y) >> 1,
-    };
+    this._history.save(this.toDataURL());
+    this._ev.trigger("save", this._history.value);
   }
 }
