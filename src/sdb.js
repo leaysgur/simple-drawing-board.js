@@ -44,6 +44,10 @@ export class SimpleDrawingBoard {
     return this._ev;
   }
 
+  get mode() {
+    return this._isDrawMode ? "draw" : "erase";
+  }
+
   setLineSize(size) {
     this._ctx.lineWidth = size | 0 || 1;
   }

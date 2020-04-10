@@ -3,6 +3,7 @@
   "version": "2.1.1",
   "description": "Just simple minimal canvas drawing lib.",
   "main": "./dist/simple-drawing-board.js",
+  "types": "./index.d.ts",
   "scripts": {
     "test": "karma start",
     "test:watch": "karma start --no-single-run --auto-watch --no-browsers",
@@ -38,6 +39,7 @@
     "karma-rollup-preprocessor": "^7.0.5",
     "prettier": "^2.0.2",
     "rollup": "^2.3.2",
-    "rollup-plugin-terser": "^5.2.0"
+    "rollup-plugin-terser": "^5.2.0",
+    "tsd": "^0.11.0"
   }
 }

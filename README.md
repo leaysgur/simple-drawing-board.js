@@ -42,7 +42,7 @@ const sdb = create(document.getElementById("canvas"));
 
 ## APIs
 
-See also [type definitions](./sdb.d.ts).
+See also [type definitions](./index.d.ts).
 
 ### setLineSize()
 ```js
@@ -72,9 +72,9 @@ sdb.clear();
 ### toggleMode()
 ```js
 // switch DRAW <=> ERASE
-// default is DRAW
+sdb.mode; // "draw"
 sdb.toggleMode();
-// now mode is ERASE
+sdb.mode; // "erase"
 ```
 
 ### toDataURL()

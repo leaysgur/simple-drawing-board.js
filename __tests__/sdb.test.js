@@ -42,6 +42,16 @@ describe("sdb#clear()", () => {
   });
 });
 
+describe("sdb#toggleMode()", () => {
+  it("should toggle mode", () => {
+    expect(sdb.mode).toBe("draw");
+    sdb.toggleMode();
+    expect(sdb.mode).toBe("erase");
+    sdb.toggleMode();
+    expect(sdb.mode).toBe("draw");
+  });
+});
+
 describe("sdb#setImageByElement()", () => {
   it("should set canvas element", async () => {
     const sdb1 = new SimpleDrawingBoard(document.createElement("canvas"));
