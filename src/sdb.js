@@ -46,14 +46,10 @@ export class SimpleDrawingBoard {
 
   setLineSize(size) {
     this._ctx.lineWidth = size | 0 || 1;
-
-    return this;
   }
 
   setLineColor(color) {
     this._ctx.strokeStyle = color;
-
-    return this;
   }
 
   fill(color) {
@@ -63,8 +59,6 @@ export class SimpleDrawingBoard {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     this._saveHistory();
-
-    return this;
   }
 
   clear() {
@@ -72,8 +66,6 @@ export class SimpleDrawingBoard {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     this._saveHistory();
-
-    return this;
   }
 
   toggleMode() {
@@ -81,8 +73,6 @@ export class SimpleDrawingBoard {
       ? "destination-out"
       : "source-over";
     this._isDrawMode = !this._isDrawMode;
-
-    return this;
   }
 
   toDataURL({ type, quality } = {}) {
