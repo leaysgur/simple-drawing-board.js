@@ -1,65 +1,15 @@
-(function(global, factory) {
-  typeof exports === "object" && typeof module !== "undefined"
-    ? (module.exports = factory())
-    : typeof define === "function" && define.amd
-    ? define(factory)
-    : ((global = global || self), (global.SimpleDrawingBoard = factory()));
-})(this, function() {
-  "use strict";
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = global || self, factory(global.SimpleDrawingBoard = {}));
+}(this, (function (exports) { 'use strict';
 
   /**
-   * touchデバイス or NOT
    *
-   * @return {Boolean}
-   *     isTouchデバイス
-   */
-  function isTouch() {
-    return "ontouchstart" in window.document;
-  }
-
-  /**
-   * 透過の背景の場合、消すモードの処理が微妙に変わるので、
-   * それをチェックしたい
-   *
-   * @param {String} color
-   *     色
-   */
-  function isTransparent(color) {
-    color = color.replace(/\s/g, "");
-    if (color === "transparent") {
-      return true;
-    }
-
-    const isRgbaOrHlsaTransparent = color.split(",")[3] === "0)";
-    if (isRgbaOrHlsaTransparent) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * ctx.drawImageできるのは3つ
-   *
-   * @param {HTMLElement} el
-   *     チェックする要素
-   * @return {Boolean}
-   *     描画できる要素かどうか
-   *
-   */
-  function isDrawableEl(el) {
-    const isDrawable =
-      ["img", "canvas", "video"].indexOf(el.tagName.toLowerCase()) !== -1;
-
-    return isDrawable;
-  }
-
-  /**
-   * Minimal event interface
+   * Minimul EventEmitter implementation
    * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
    *
    */
-
   class Eve {
     constructor() {
       this._events = {};
@@ -104,370 +54,257 @@
           : handler.call(this, evData);
       }
     }
+
+    removeAllListeners() {
+      this._events = {};
+    }
   }
 
   /**
-   * Stack Data Structure
+   *
+   * History for undo/redo Structure
+   * See `https://gist.github.com/leader22/9fbed07106d652ef40fda702da4f39c4`
+   *
    */
-  class Stack {
-    constructor() {
-      this._items = [];
+  class History {
+    constructor(initialValue = null) {
+      this._past = [];
+      this._present = initialValue;
+      this._future = [];
     }
 
-    get(i) {
-      return this._items[i];
+    get value() {
+      return this._present;
     }
 
-    push(item) {
-      this._items.push(item);
+    undo() {
+      if (this._past.length === 0) return;
+
+      const previous = this._past[this._past.length - 1];
+      const newPast = this._past.slice(0, this._past.length - 1);
+      this._past = newPast;
+      this._future = [this._present, ...this._future];
+      this._present = previous;
     }
 
-    pop() {
-      if (this._items.length > 0) {
-        return this._items.pop();
-      }
-      return null;
+    redo() {
+      if (this._future.length === 0) return;
+
+      const next = this._future[0];
+      const newFuture = this._future.slice(1);
+      this._past = [...this._past, this._present];
+      this._future = newFuture;
+      this._present = next;
     }
 
-    shift() {
-      if (this._items.length > 0) {
-        return this._items.shift();
-      }
-      return null;
+    save(newPresent) {
+      if (this._present === newPresent) return;
+
+      this._past = [...this._past, this._present];
+      this._future = [];
+      this._present = newPresent;
     }
 
     clear() {
-      this._items.length = 0;
-    }
-
-    size() {
-      return this._items.length;
+      this._past.length = 0;
+      this._future.length = 0;
     }
   }
 
+  function isTouch() {
+    return "ontouchstart" in window.document;
+  }
+
+  // expect HTML elements from CanvasImageSource
+  function isDrawableElement($el) {
+    if ($el instanceof HTMLImageElement) return true;
+    if ($el instanceof SVGImageElement) return true;
+    if ($el instanceof HTMLCanvasElement) return true;
+    if ($el instanceof HTMLVideoElement) return true;
+    return false;
+  }
+
+  function isBase64DataURL(url) {
+    if (typeof url !== "string") return false;
+    if (!url.startsWith("data:image/")) return false;
+    return true;
+  }
+
+  async function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => resolve(img);
+      img.src = src;
+    });
+  }
+
+  function getMidInputCoords(old, coords) {
+    return {
+      x: (old.x + coords.x) >> 1,
+      y: (old.y + coords.y) >> 1,
+    };
+  }
+
+  function getInputCoords(ev, $el) {
+    let x, y;
+    if (isTouch()) {
+      x = ev.touches[0].pageX;
+      y = ev.touches[0].pageY;
+    } else {
+      x = ev.pageX;
+      y = ev.pageY;
+    }
+
+    // check this every time for real-time resizing
+    const elBCRect = $el.getBoundingClientRect();
+
+    // need to consider scrolled positions
+    const elRect = {
+      left: elBCRect.left + window.pageXOffset,
+      top: elBCRect.top + window.pageYOffset,
+    };
+
+    // if canvas has styled
+    const elScale = {
+      x: $el.width / elBCRect.width,
+      y: $el.height / elBCRect.height,
+    };
+
+    return {
+      x: (x - elRect.left) * elScale.x,
+      y: (y - elRect.top) * elScale.y,
+    };
+  }
+
   class SimpleDrawingBoard {
-    constructor(el, options) {
-      if (!(el instanceof HTMLCanvasElement)) {
-        throw new Error("Pass canvas element as first argument.");
-      }
+    constructor($el) {
+      this._$el = $el;
+      this._ctx = this._$el.getContext("2d");
 
-      this.ev = new Eve();
-      this.el = el;
-      this.ctx = el.getContext("2d");
+      // handwriting fashion ;D
+      this._ctx.lineCap = this._ctx.lineJoin = "round";
 
-      // trueの時だけstrokeされる
-      this._isDrawing = 0;
-      // 描画用のタイマー
+      // for canvas operation
+      this._isDrawMode = true;
+
+      // for drawing
+      this._isDrawing = false;
       this._timer = null;
-      // 座標情報
       this._coords = {
         old: { x: 0, y: 0 },
         oldMid: { x: 0, y: 0 },
-        current: { x: 0, y: 0 }
-      };
-      this._settings = {
-        lineColor: "#aaa",
-        lineSize: 5,
-        boardColor: "transparent",
-        historyDepth: 10,
-        isTransparent: 1,
-        isDrawMode: 1
-      };
-      // 描画履歴
-      this._history = {
-        // undo
-        prev: new Stack(),
-        // redo
-        next: new Stack()
+        current: { x: 0, y: 0 },
       };
 
-      this._initBoard(options);
+      this._ev = new Eve();
+      this._history = new History(this.toDataURL());
+
+      this._bindEvents();
+      this._drawFrame();
     }
 
-    /**
-     * 線の太さを設定する
-     *
-     * @param {Number} size
-     *     太さ(1以下は全て1とする)
-     *
-     */
+    get canvas() {
+      return this._$el;
+    }
+
+    get observer() {
+      return this._ev;
+    }
+
     setLineSize(size) {
-      this.ctx.lineWidth = size | 0 || 1;
-      return this;
+      this._ctx.lineWidth = size | 0 || 1;
     }
 
-    /**
-     * 線の色を設定する
-     *
-     * @param {String} color
-     *     色
-     *
-     */
     setLineColor(color) {
-      this.ctx.strokeStyle = color;
-      return this;
+      this._ctx.strokeStyle = color;
     }
 
-    /**
-     * 単一の色で塗りつぶす
-     *
-     * @param {String} color
-     *     色
-     *
-     */
     fill(color) {
+      const ctx = this._ctx;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
       this._saveHistory();
-      this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-      this.ctx.fillStyle = color;
-      this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-      return this;
     }
 
-    /**
-     * ボードをクリアする
-     * 実際は、背景色で塗りつぶす
-     *
-     */
     clear() {
-      const settings = this._settings;
+      const ctx = this._ctx;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
       this._saveHistory();
-      // 透明なときは一手間
-      if (settings.isTransparent) {
-        const oldGCO = this.ctx.globalCompositeOperation;
-        this.ctx.globalCompositeOperation = "destination-out";
-        this.fill(this._settings.boardColor);
-        this.ctx.globalCompositeOperation = oldGCO;
-      }
-      // 違うならそのまま
-      else {
-        this.fill(this._settings.boardColor);
-      }
-
-      return this;
     }
 
-    /**
-     * 書くモードと消すモードをスイッチ
-     *
-     */
     toggleMode() {
-      const settings = this._settings;
-      // 消す
-      if (settings.isDrawMode) {
-        this.setLineColor(settings.boardColor);
-        if (settings.isTransparent) {
-          this.ctx.globalCompositeOperation = "destination-out";
-        }
-        settings.isDrawMode = 0;
-      }
-      // 書く
-      else {
-        this.setLineColor(settings.lineColor);
-        if (settings.isTransparent) {
-          this.ctx.globalCompositeOperation = "source-over";
-        }
-        settings.isDrawMode = 1;
-      }
-
-      this.ev.trigger("toggleMode", settings.isDrawMode);
-      return this;
+      this._ctx.globalCompositeOperation = this._isDrawMode
+        ? "destination-out"
+        : "source-over";
+      this._isDrawMode = !this._isDrawMode;
     }
 
-    /**
-     * 現在のボードをbase64文字列で取得
-     *
-     * @return {String}
-     *     base64文字列
-     *
-     */
-    getImg() {
-      return this.ctx.canvas.toDataURL("image/png");
+    toDataURL({ type, quality } = {}) {
+      return this._ctx.canvas.toDataURL(type, quality);
     }
 
-    /**
-     * 現在のボードをなんかしら復元
-     *
-     * @param {String|HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} src
-     *     画像URLか、drawImageできる要素
-     * @param {Boolean} isOverlay
-     *     上に重ねるならtrue
-     * @param {Boolean} isSkipSaveHistory
-     *     履歴保存をスキップするならtrue（デフォルトfalse）
-     *
-     */
-    setImg(src, isOverlay, isSkipSaveHistory) {
-      isOverlay = isOverlay || false;
-      isSkipSaveHistory = isSkipSaveHistory || false;
-      if (!isSkipSaveHistory) {
-        this._saveHistory();
-      }
+    setImageByElement($el) {
+      if (!isDrawableElement($el))
+        throw new TypeError("Passed element is not a drawable!");
 
-      // imgUrl
-      if (typeof src === "string") {
-        this._setImgByImgSrc(src, isOverlay);
-      }
-      // img, video, canvas element
-      else {
-        this._setImgByDrawableEl(src, isOverlay);
-      }
+      const ctx = this._ctx;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage($el, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
-      return this;
+      this._saveHistory();
     }
 
-    /**
-     * 履歴を戻す
-     *
-     */
-    undo() {
-      this._restoreFromHistory(false);
+    async setImageByDataURL(src) {
+      if (!isBase64DataURL(src))
+        throw new TypeError("Passed src is not a base64 data URL!");
+
+      const img = await loadImage(src);
+
+      const ctx = this._ctx;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      this._saveHistory();
     }
 
-    /**
-     * 履歴を進める
-     *
-     */
-    redo() {
-      this._restoreFromHistory(true);
+    async undo() {
+      this._history.undo();
+      const base64 = this._history.value;
+      if (!isBase64DataURL(base64)) return;
+
+      const img = await loadImage(base64);
+
+      const ctx = this._ctx;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
     }
 
-    /**
-     * 後始末
-     *
-     */
-    dispose() {
+    async redo() {
+      this._history.redo();
+      const base64 = this._history.value;
+      if (!isBase64DataURL(base64)) return;
+
+      const img = await loadImage(base64);
+
+      const ctx = this._ctx;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
+
+    destroy() {
       this._unbindEvents();
+
+      this._ev.removeAllListeners();
+      this._history.clear();
 
       cancelAnimationFrame(this._timer);
       this._timer = null;
-
-      this._history.prev.clear();
-      this._history.next.clear();
-
-      this.ev.trigger("dispose");
     }
 
-    /**
-     * ボードを初期化する
-     *
-     * @param {Object} options
-     *     初期化オプション
-     *     `Const.settings`参照
-     *
-     */
-    _initBoard(options) {
-      const settings = this._settings;
-
-      if (options) {
-        for (const p in options) {
-          settings[p] = options[p];
-        }
-      }
-
-      // 透過な時は消すモードで一手間必要になる
-      if (isTransparent(settings.boardColor)) {
-        settings.boardColor = "rgba(0,0,0,1)";
-        settings.isTransparent = 1;
-      }
-
-      // 初期は書くモード
-      settings.isDrawMode = 1;
-
-      this.ctx.lineCap = this.ctx.lineJoin = "round";
-      this.setLineSize(settings.lineSize);
-      this.setLineColor(settings.lineColor);
-
-      this._bindEvents();
-      this._draw();
-    }
-
-    _bindEvents() {
-      const events = isTouch()
-        ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
-        : ["mousedown", "mousemove", "mouseup", "mouseout"];
-
-      for (let i = 0, l = events.length; i < l; i++) {
-        this.el.addEventListener(events[i], this, false);
-      }
-    }
-
-    _unbindEvents() {
-      const events = isTouch()
-        ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
-        : ["mousedown", "mousemove", "mouseup", "mouseout"];
-
-      for (let i = 0, l = events.length; i < l; i++) {
-        this.el.removeEventListener(events[i], this, false);
-      }
-    }
-
-    /**
-     * 実際の描画処理
-     * 別のイベントで集めた座標情報を元に、描画するだけ
-     *
-     */
-    _draw() {
-      // さっきと同じ場所なら書かなくていい
-      const isSameCoords =
-        this._coords.old.x === this._coords.current.x &&
-        this._coords.old.y === this._coords.current.y;
-
-      if (this._isDrawing && !isSameCoords) {
-        const currentMid = this._getMidInputCoords(this._coords.current);
-        this.ctx.beginPath();
-        this.ctx.moveTo(currentMid.x, currentMid.y);
-        this.ctx.quadraticCurveTo(
-          this._coords.old.x,
-          this._coords.old.y,
-          this._coords.oldMid.x,
-          this._coords.oldMid.y
-        );
-        this.ctx.stroke();
-
-        this._coords.old = this._coords.current;
-        this._coords.oldMid = currentMid;
-
-        this.ev.trigger("draw", this._coords.current);
-      }
-
-      this._timer = requestAnimationFrame(this._draw.bind(this));
-    }
-
-    /**
-     * 描画しはじめの処理
-     *
-     */
-    _onInputDown(ev) {
-      this._saveHistory();
-      this._isDrawing = 1;
-
-      const coords = this._getInputCoords(ev);
-      this._coords.current = this._coords.old = coords;
-      this._coords.oldMid = this._getMidInputCoords(coords);
-    }
-
-    /**
-     * 描画してる間の処理
-     *
-     */
-    _onInputMove(ev) {
-      this._coords.current = this._getInputCoords(ev);
-    }
-
-    /**
-     * 描画しおわりの処理
-     *
-     */
-    _onInputUp() {
-      this._isDrawing = 0;
-    }
-
-    /**
-     * いわゆるhandleEvent
-     *
-     * @param {Object} ev
-     *     イベント
-     *
-     */
     handleEvent(ev) {
       ev.preventDefault();
       ev.stopPropagation();
@@ -482,178 +319,113 @@
           this._onInputMove(ev);
           break;
         case "mouseup":
-        case "mouseout":
         case "touchend":
-        case "touchcancel":
-        case "gesturestart":
           this._onInputUp();
           break;
-        default:
+        case "mouseout":
+        case "touchcancel":
+        case "gesturestart":
+          this._onInputCancel();
+          break;
       }
     }
 
-    /**
-     * 座標の取得
-     *
-     * @param {Object} ev
-     *     イベント
-     * @return {Object}
-     *     x, y座標
-     *
-     */
-    _getInputCoords(ev) {
-      let x, y;
-      if (isTouch()) {
-        x = ev.touches[0].pageX;
-        y = ev.touches[0].pageY;
-      } else {
-        x = ev.pageX;
-        y = ev.pageY;
+    _bindEvents() {
+      const events = isTouch()
+        ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
+        : ["mousedown", "mousemove", "mouseup", "mouseout"];
+
+      for (const ev of events) {
+        this._$el.addEventListener(ev, this, false);
+      }
+    }
+    _unbindEvents() {
+      const events = isTouch()
+        ? ["touchstart", "touchmove", "touchend", "touchcancel", "gesturestart"]
+        : ["mousedown", "mousemove", "mouseup", "mouseout"];
+
+      for (const ev of events) {
+        this._$el.removeEventListener(ev, this, false);
+      }
+    }
+
+    _drawFrame() {
+      this._timer = requestAnimationFrame(() => this._drawFrame());
+
+      if (!this._isDrawing) return;
+
+      const isSameCoords =
+        this._coords.old.x === this._coords.current.x &&
+        this._coords.old.y === this._coords.current.y;
+
+      const currentMid = getMidInputCoords(
+        this._coords.old,
+        this._coords.current
+      );
+      const ctx = this._ctx;
+
+      ctx.beginPath();
+      ctx.moveTo(currentMid.x, currentMid.y);
+      ctx.quadraticCurveTo(
+        this._coords.old.x,
+        this._coords.old.y,
+        this._coords.oldMid.x,
+        this._coords.oldMid.y
+      );
+      ctx.stroke();
+
+      this._coords.old = this._coords.current;
+      this._coords.oldMid = currentMid;
+
+      if (!isSameCoords) this._ev.trigger("draw", this._coords.current);
+    }
+
+    _onInputDown(ev) {
+      this._isDrawing = true;
+
+      const coords = getInputCoords(ev, this._$el);
+      this._coords.current = this._coords.old = coords;
+      this._coords.oldMid = getMidInputCoords(this._coords.old, coords);
+
+      this._ev.trigger("drawBegin", this._coords.current);
+    }
+
+    _onInputMove(ev) {
+      this._coords.current = getInputCoords(ev, this._$el);
+    }
+
+    _onInputUp() {
+      this._ev.trigger("drawEnd", this._coords.current);
+      this._saveHistory();
+
+      this._isDrawing = false;
+    }
+
+    _onInputCancel() {
+      if (this._isDrawing) {
+        this._ev.trigger("drawEnd", this._coords.current);
+        this._saveHistory();
       }
 
-      // いつリサイズされてもよいようリアルタイムに
-      const elBCRect = this.el.getBoundingClientRect();
-
-      // スクロールされた状態でリロードすると、位置ズレするので加味する
-      const elRect = {
-        left: elBCRect.left + window.pageXOffset,
-        top: elBCRect.top + window.pageYOffset
-      };
-      // canvasのstyle指定に対応する
-      const elScale = {
-        x: this.el.width / elBCRect.width,
-        y: this.el.height / elBCRect.height
-      };
-
-      return {
-        x: (x - elRect.left) * elScale.x,
-        y: (y - elRect.top) * elScale.y
-      };
+      this._isDrawing = false;
     }
 
-    /**
-     * 座標の取得
-     *
-     * @param {Object} coords
-     *     元のx, y座標
-     * @return {Object}
-     *     変換されたx, y座標
-     *
-     */
-    _getMidInputCoords(coords) {
-      return {
-        x: (this._coords.old.x + coords.x) >> 1,
-        y: (this._coords.old.y + coords.y) >> 1
-      };
-    }
-
-    /**
-     * 現在のボードを画像URLから復元
-     *
-     * @param {String} src
-     *     画像URL
-     * @param {Boolean} isOverlay
-     *     現在のボードを消さずに復元するならtrue
-     *
-     */
-    _setImgByImgSrc(src, isOverlay) {
-      const ctx = this.ctx;
-      const oldGCO = ctx.globalCompositeOperation;
-      const img = new Image();
-
-      img.onload = function() {
-        ctx.globalCompositeOperation = "source-over";
-        isOverlay || ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.globalCompositeOperation = oldGCO;
-      };
-
-      img.src = src;
-    }
-
-    /**
-     * 現在のボードを特定の要素から復元
-     *
-     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} el
-     *     drawImageできる要素
-     * @param {Boolean} isOverlay
-     *     現在のボードを消さずに復元するならtrue
-     *
-     */
-    _setImgByDrawableEl(el, isOverlay) {
-      if (!isDrawableEl(el)) {
-        return;
-      }
-
-      const ctx = this.ctx;
-      const oldGCO = ctx.globalCompositeOperation;
-
-      ctx.globalCompositeOperation = "source-over";
-      isOverlay || ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.drawImage(el, 0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.globalCompositeOperation = oldGCO;
-    }
-
-    /**
-     * 履歴に現在のボードを保存する
-     *
-     */
     _saveHistory() {
-      const history = this._history;
-
-      // 最後の履歴と同じ結果なら保存しない
-      const curImg = this.getImg();
-      const lastImg = history.prev.get(history.prev.size() - 1);
-      if (lastImg && curImg === lastImg) {
-        return;
-      }
-
-      // 履歴には限度がある
-      while (history.prev.size() >= this._settings.historyDepth) {
-        // 古い履歴から消していく
-        history.prev.shift();
-      }
-
-      // 普通にセーブ
-      history.prev.push(curImg);
-      // redo用履歴はクリアする
-      history.next.clear();
-
-      this.ev.trigger("save", curImg);
-    }
-
-    /**
-     * 履歴から復元する
-     *
-     * @param {Boolean} goForth
-     *     戻す or やり直すで、やり直すならtrue
-     *
-     */
-    _restoreFromHistory(goForth) {
-      const history = this._history;
-      let pushKey = "next";
-      let popKey = "prev";
-      if (goForth) {
-        // redoのときはnextからpopし、prevにpushする
-        pushKey = "prev";
-        popKey = "next";
-      }
-      const item = history[popKey].pop();
-      if (item == null) {
-        return;
-      }
-
-      // 最後の履歴と同じ結果なら保存しない
-      const curImg = this.getImg();
-      const lastImg = history.next.get(history.next.size() - 1);
-      if (!lastImg || lastImg != curImg) {
-        history[pushKey].push(curImg);
-      }
-
-      // この操作は履歴を保存しない
-      this.setImg(item, false, true);
+      this._history.save(this.toDataURL());
+      this._ev.trigger("save", this._history.value);
     }
   }
 
-  return SimpleDrawingBoard;
-});
+  function create($el) {
+    if (!($el instanceof HTMLCanvasElement))
+      throw new TypeError("HTMLCanvasElement must be passed as first argument!");
+
+    const sdb = new SimpleDrawingBoard($el);
+    return sdb;
+  }
+
+  exports.create = create;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
