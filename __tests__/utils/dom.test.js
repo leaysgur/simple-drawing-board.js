@@ -4,14 +4,14 @@ import {
   isBase64DataURL,
 } from "../../src/utils/dom";
 
-describe("isTouch", () => {
+describe("utils/dom#isTouch", () => {
   it("should return false", () => {
     // in ChromeHeadless
     expect(isTouch()).toBeFalsy();
   });
 });
 
-describe("isDrawableElement", () => {
+describe("utils/dom#isDrawableElement", () => {
   it("should return true", () => {
     const els = [
       document.createElement("img"),
@@ -32,7 +32,7 @@ describe("isDrawableElement", () => {
   });
 });
 
-describe("isBase64DataURL", () => {
+describe("utils/dom#isBase64DataURL", () => {
   it("should return true", () => {
     const urls = ["data:image/png", "data:image/jpeg"];
     for (const url of urls) {

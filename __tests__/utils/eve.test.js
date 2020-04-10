@@ -1,6 +1,6 @@
 import { Eve } from "../../src/utils/eve";
 
-describe("Eve", () => {
+describe("utils/eve", () => {
   it("should fire event", (done) => {
     const ev = new Eve();
     ev.on("yo", done);

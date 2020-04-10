@@ -36,6 +36,10 @@ export class SimpleDrawingBoard {
     this._drawFrame();
   }
 
+  get canvas() {
+    return this._$el;
+  }
+
   get observer() {
     return this._ev;
   }

@@ -1,6 +1,6 @@
 import { History } from "../../src/utils/history";
 
-describe("History", () => {
+describe("utils/history", () => {
   it("should apply initialValue", () => {
     const history = new History();
     expect(history.value).toBe(null);
