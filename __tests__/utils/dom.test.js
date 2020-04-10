@@ -1,4 +1,8 @@
-import { isTouch, isDrawableElement } from "../../src/utils/utils";
+import {
+  isTouch,
+  isDrawableElement,
+  isBase64DataURL,
+} from "../../src/utils/dom";
 
 describe("isTouch", () => {
   it("should return false", () => {
@@ -24,6 +28,22 @@ describe("isDrawableElement", () => {
     const els = [document.createElement("p"), document.createElement("audio")];
     for (const el of els) {
       expect(isDrawableElement(el)).toBeFalsy();
+    }
+  });
+});
+
+describe("isBase64DataURL", () => {
+  it("should return true", () => {
+    const urls = ["data:image/png", "data:image/jpeg"];
+    for (const url of urls) {
+      expect(isBase64DataURL(url)).toBeTruthy();
+    }
+  });
+
+  it("should return false", () => {
+    const urls = ["data:video/mpeg", "", new Image()];
+    for (const url of urls) {
+      expect(isBase64DataURL(url)).toBeFalsy();
     }
   });
 });
