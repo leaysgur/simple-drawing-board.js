@@ -1,10 +1,10 @@
 /**
- * Minimal event interface
+ *
+ * Minimul EventEmitter implementation
  * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
  *
  */
-
-class Eve {
+export class Eve {
   constructor() {
     this._events = {};
   }
@@ -48,6 +48,8 @@ class Eve {
         : handler.call(this, evData);
     }
   }
-}
 
-export default Eve;
+  removeAllListeners() {
+    this._events = {};
+  }
+}

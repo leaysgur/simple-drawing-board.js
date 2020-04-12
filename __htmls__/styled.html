@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>SimpleDrawingBoard TEST</title>
+  <style>
+    body {
+      text-align: center;
+      background-color: #eee;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background-color: lightblue;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+  <p>It should work w/ styled canvas</p>
+  <p>It should work w/ scrolled</p>
+  <!-- styleを指定 -->
+  <canvas style="width: 400px; height: 1200px" id="c" width="800" height="2400"></canvas>
+  <div>
+    <button onclick="sdb.destroy()">destroy</button>
+    <button onclick="sdb.clear()">clear</button>
+    <button onclick="sdb.toggleMode()">toggleMode</button>
+    /
+    <button onclick="sdb.undo()">undo</button>
+    <button onclick="sdb.redo()">redo</button>
+  </div>
+  <div>
+    <button onclick="sdb.setLineColor('#000')">line:black</button>
+    <button onclick="sdb.setLineColor('#00f')">line:blue</button>
+    /
+    <button onclick="sdb.setLineSize(10)">line:mid</button>
+    <button onclick="sdb.setLineSize(30)">line:bold</button>
+    /
+    <button onclick="sdb.fill('#fff')">fill:white</button>
+    <button onclick="sdb.fill('#000')">fill:black</button>
+  </div>
+
+  <script src="../../dist/simple-drawing-board.js"></script>
+  <script>
+    const { create } = window.SimpleDrawingBoard;
+    const c = document.getElementById("c");
+    window.sdb = create(c);
+  </script>
+</body>
+</html>

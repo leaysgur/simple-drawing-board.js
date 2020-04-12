@@ -1,10 +1,13 @@
 module.exports = {
   env: {
     es6: true,
+    node: true,
+    jasmine: true,
     browser: true
   },
   parserOptions: {
-    sourceType: "module"
+    ecmaVersion: 2020,
+    sourceType: 'module',
   },
   extends: [
     "eslint:recommended",

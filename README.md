@@ -3,8 +3,15 @@
 Just simple minimal canvas drawing lib.
 
 - 0 dependencies
-- Mobile browser, IE11 compatibility
-- Only 4.4KB(gzip)
+- Modern browser compatibility
+- Under 500 lines of code
+
+> For `v2.x` users
+> See https://github.com/leader22/simple-drawing-board.js/tree/v2.1.1
+
+> For `v1.x` users
+> See https://github.com/leader22/simple-drawing-board.js/tree/v1.4.1
+
 
 ## Install
 ```sh
@@ -18,107 +25,120 @@ or
 ```
 
 ## How to use
+
+Prepare your `canvas` element.
+
 ```html
 <canvas id="canvas" width="500" height="300"></canvas>
 ```
 
-```javascript
-const sdb = new SimpleDrawingBoard(document.getElementById('canvas'));
+Then create drawing board.
 
-// w/ options
-const sdb = new SimpleDrawingBoard(document.getElementById('canvas'), {
-  lineColor:    '#000',
-  lineSize:     5,
-  boardColor:   'transparent',
-  historyDepth: 10
-});
+```javascript
+import { create } from "simple-drawing-board.js";
+
+const sdb = create(document.getElementById("canvas"));
 ```
 
 ## APIs
-### setLineSize
-```javascript
+
+See also [type definitions](./index.d.ts).
+
+### setLineSize()
+```js
 sdb.setLineSize(10);
 sdb.setLineSize(0);  // to be 1
 sdb.setLineSize(-1); // to be 1
 ```
 
-### setLineColor
-```javascript
-sdb.setLineColor('#0094c8');
-sdb.setLineColor('red');
-sdb.setLineColor('#0f0');
+### setLineColor()
+```js
+sdb.setLineColor("#0094c8");
+sdb.setLineColor("red");
+sdb.setLineColor("#0f0");
 ```
 
-### fill
-```javascript
-sdb.fill('#000');
+### fill()
+```js
+sdb.fill("#000");
+sdb.fill("orange");
 ```
 
-### clear
-```javascript
-sdb.clear(); // fill with default boardColor
+### clear()
+```js
+sdb.clear();
 ```
 
-### toggleMode
-```javascript
+### toggleMode()
+```js
 // switch DRAW <=> ERASE
-sdb.toggleMode(); // default is DRAW, so now mode is ERASE
+sdb.mode; // "draw"
+sdb.toggleMode();
+sdb.mode; // "erase"
 ```
 
-### getImg
-```javascript
-sdb.getImg(); // 'data:image/png;base64,xxxxxx....'
+### toDataURL()
+```js
+sdb.toDataURL(); // "data:image/png;base64,xxxxxx...."
+sdb.toDataURL({ type: "image/jpeg" }); // "data:image/jpeg;base64,xxxxxx...."
+sdb.toDataURL({ type: "image/jpeg", quality: 0.3 }); // compression quality
 ```
 
-### setImg
-```javascript
-sdb.setImg('data:image/png;base64,xxxxxx....');       // replace
-sdb.setImg('data:image/png;base64,xxxxxx....', true); // overlay
+### fillImageByElement()
+```js
+sdb.fillImageByElement(document.getElementById("img"));
 ```
 
-### undo
-```javascript
-sdb.undo(); // go back history
+
+### async fillImageByDataURL()
+```js
+await sdb.fillImageByDataURL("data:image/png;base64,xxxxxx....");
 ```
 
-### redo
-```javascript
-sdb.redo(); // go forward history
+### async undo()
+```js
+await sdb.undo();
 ```
 
-### dispose
-```javascript
-sdb.dispose(); // remove all events and clear history
+### async redo()
+```js
+await sdb.redo();
+```
+
+### destroy()
+```js
+sdb.destroy();
 ```
 
 ## Events
-Available events are below.
 
-```javascript
-sdb.ev.on('toggleMode', function(isDrawMode) {
-    if (isDrawMode) {
-        console.log('Draw mode.');
-    } else {
-        console.log('Erase mode.');
-    }
-});
+Events are available via `observer` property.
 
-sdb.ev.on('dispose', function() {
-    console.log('Do something on dispose.');
-});
-
-sdb.ev.on('drawBegin', function(coords) {
+### drawBegin
+```js
+sdb.observer.on("drawBegin", (coords) => {
     console.log(coords.x, coords.y);
 });
-sdb.ev.on('draw', function(coords) {
-    console.log(coords.x, coords.y);
-});
-sdb.ev.on('drawEnd', function(coords) {
-    console.log(coords.x, coords.y);
-});
+```
 
-sdb.ev.on('save', function(curImg) {
-    console.log(curImg); // 'data:image/png;base64,xxxxxx....'
+### draw
+```js
+sdb.observer.on("draw", (coords) => {
+    console.log(coords.x, coords.y);
+});
+```
+
+### drawEnd
+```js
+sdb.observer.on("drawEnd", (coords) => {
+    console.log(coords.x, coords.y);
+});
+```
+
+### save
+```js
+sdb.observer.on("save", (curImg) => {
+    console.log(curImg); // "data:image/png;base64,xxxxxx...."
 });
 ```
 
