@@ -84,15 +84,15 @@ sdb.toDataURL({ type: "image/jpeg" }); // "data:image/jpeg;base64,xxxxxx...."
 sdb.toDataURL({ type: "image/jpeg", quality: 0.3 }); // compression quality
 ```
 
-### setImageByElement()
+### fillImageByElement()
 ```js
-sdb.setImageByElement(document.getElementById("img"));
+sdb.fillImageByElement(document.getElementById("img"));
 ```
 
 
-### async setImageByDataURL()
+### async fillImageByDataURL()
 ```js
-await sdb.setImageByDataURL("data:image/png;base64,xxxxxx....");
+await sdb.fillImageByDataURL("data:image/png;base64,xxxxxx....");
 ```
 
 ### async undo()

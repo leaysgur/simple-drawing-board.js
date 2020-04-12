@@ -14,8 +14,8 @@ declare class SimpleDrawingBoard {
   clear(): void;
   toggleMode(): void;
   toDataURL(): string;
-  setImageByElement($el: CanvasImageSource): void;
-  setImageByDataURL(src: string): Promise<void>;
+  fillImageByElement($el: CanvasImageSource): void;
+  fillImageByDataURL(src: string): Promise<void>;
   undo(): Promise<void>;
   redo(): Promise<void>;
   destroy(): void;

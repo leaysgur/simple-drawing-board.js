@@ -52,7 +52,7 @@ describe("sdb#toggleMode()", () => {
   });
 });
 
-describe("sdb#setImageByElement()", () => {
+describe("sdb#fillImageByElement()", () => {
   it("should set canvas element", async () => {
     const sdb1 = new SimpleDrawingBoard(document.createElement("canvas"));
     const sdb2 = new SimpleDrawingBoard(document.createElement("canvas"));
@@ -60,20 +60,20 @@ describe("sdb#setImageByElement()", () => {
     sdb1.fill("orange");
     const url1 = sdb1.toDataURL();
 
-    sdb2.setImageByElement(sdb1.canvas);
+    sdb2.fillImageByElement(sdb1.canvas);
     const url2 = sdb2.toDataURL();
 
     expect(url1).toBe(url2);
   });
 });
 
-describe("sdb#setImageByDataURL()", () => {
+describe("sdb#fillImageByDataURL()", () => {
   it("should set png", async () => {
     sdb.fill("black");
     const url1 = sdb.toDataURL({ type: "image/png" });
 
     sdb.clear();
-    await sdb.setImageByDataURL(url1);
+    await sdb.fillImageByDataURL(url1);
     const url2 = sdb.toDataURL();
     expect(url1).toBe(url2);
   });
@@ -83,7 +83,7 @@ describe("sdb#setImageByDataURL()", () => {
     const url1 = sdb.toDataURL({ type: "image/jpeg" });
 
     sdb.clear();
-    await sdb.setImageByDataURL(url1);
+    await sdb.fillImageByDataURL(url1);
     const url2 = sdb.toDataURL({ type: "image/jpeg" });
     expect(url1).toBe(url2);
   });

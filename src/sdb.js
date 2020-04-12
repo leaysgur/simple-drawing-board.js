@@ -83,7 +83,7 @@ export class SimpleDrawingBoard {
     return this._ctx.canvas.toDataURL(type, quality);
   }
 
-  setImageByElement($el) {
+  fillImageByElement($el) {
     if (!isDrawableElement($el))
       throw new TypeError("Passed element is not a drawable!");
 
@@ -94,7 +94,7 @@ export class SimpleDrawingBoard {
     this._saveHistory();
   }
 
-  async setImageByDataURL(src) {
+  async fillImageByDataURL(src) {
     if (!isBase64DataURL(src))
       throw new TypeError("Passed src is not a base64 data URL!");
 
