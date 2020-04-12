@@ -39,7 +39,6 @@
     "karma-rollup-preprocessor": "^7.0.5",
     "prettier": "^2.0.2",
     "rollup": "^2.3.2",
-    "rollup-plugin-terser": "^5.2.0",
-    "tsd": "^0.11.0"
+    "rollup-plugin-terser": "^5.2.0"
   }
 }
