@@ -4,50 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
   <title>SimpleDrawingBoard DEMO</title>
-  <style>
-    body {
-      background-color: #eee;
-      text-align: center;
-    }
-    canvas {
-      width: 95vw;
-      height: 95vw;
-      border: 1px solid #ccc;
-      cursor: crosshair;
-    }
-  </style>
+  <link rel="stylesheet" href="./app.css">
 </head>
 <body>
-  <canvas id="c" width="1000" height="1000"></canvas>
-  <div>
-    LineColor:
-    <button onclick="sdb.setLineColor('#000')">black</button>
-    <button onclick="sdb.setLineColor('#f00')">red</button>
-    <button onclick="sdb.setLineColor('#0f0')">green</button>
-    <button onclick="sdb.setLineColor('#00f')">blue</button>
+  <canvas class="canvas" id="cv" width="1000" height="1000"></canvas>
+  <div class="controls">
+    <div>
+      LineColor:
+      <input id="lc" type="color" oninput="sdb.setLineColor(this.value)">
+    </div>
+    <div>
+      LineSize:
+      <input id="ls" type="range" value="1" min="1" max="50" oninput="sdb.setLineSize(this.value)">
+    </div>
+    <div>
+      Fill:
+      <input type="color" value="#ffffff" oninput="sdb.fill(this.value)">
+      <button onclick="sdb.clear()">clear</button>
+    </div>
+    <div>
+      Misc:
+      <button onclick="sdb.undo()">undo</button>
+      <button onclick="sdb.redo()">redo</button>
+    </div>
   </div>
-  <div>
-    LineSize:
-    <button onclick="sdb.setLineSize(1)">thin</button>
-    <button onclick="sdb.setLineSize(15)">mid</button>
-    <button onclick="sdb.setLineSize(30)">bold</button>
-  </div>
-  <div>
-    Fill:
-    <button onclick="sdb.fill('#fff')">white</button>
-    <button onclick="sdb.fill('#000')">black</button>
-  </div>
-  <div>
-    Misc:
-    <button onclick="sdb.clear()">clear</button>
-    <button onclick="sdb.undo()">undo</button>
-    <button onclick="sdb.redo()">redo</button>
-  </div>
-
   <script src="./simple-drawing-board.js"></script>
   <script>
-    const c = document.getElementById("c");
-    window.sdb = window.SimpleDrawingBoard.create(c);
+    const lc = document.getElementById("lc");
+    const ls = document.getElementById("ls");
+    const cv = document.getElementById("cv");
+
+    window.sdb = window.SimpleDrawingBoard.create(cv);
+
+    sdb.fill("#ffffff");
+
+    const lineColor = randomColor();
+    sdb.setLineColor(lineColor);
+    lc.value = lineColor;
+
+    const lineSize = 5;
+    sdb.setLineSize(lineSize);
+    ls.value = lineSize;
+
+    function randomColor() {
+      const chars = "0123456789abcdef";
+      let color = "#";
+      while (color.length !== 7) {
+        color += chars[Math.random() * chars.length|0];
+      }
+      return color;
+    }
   </script>
 </body>
 </html>
