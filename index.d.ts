@@ -4,6 +4,10 @@ declare class Eve {
   trigger(ev: string, payload: any): void;
 }
 
+interface FillImageOptions = {
+  isOverlay?: boolean;
+}
+
 declare class SimpleDrawingBoard {
   get observer(): Eve;
   get canvas(): HTMLCanvasElement;
@@ -14,8 +18,8 @@ declare class SimpleDrawingBoard {
   clear(): void;
   toggleMode(): void;
   toDataURL(): string;
-  fillImageByElement($el: CanvasImageSource): void;
-  fillImageByDataURL(src: string): Promise<void>;
+  fillImageByElement($el: CanvasImageSource, options?: FillImageOptions): void;
+  fillImageByDataURL(src: string, options?: FillImageOptions): Promise<void>;
   undo(): Promise<void>;
   redo(): Promise<void>;
   destroy(): void;
