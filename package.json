@@ -1,6 +1,6 @@
 {
   "name": "simple-drawing-board",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Just simple minimal canvas drawing lib.",
   "main": "./dist/simple-drawing-board.js",
   "types": "./index.d.ts",
@@ -44,7 +44,10 @@
   },
   "tsd": {
     "compilerOptions": {
-      "lib": ["dom", "es2020"]
+      "lib": [
+        "dom",
+        "es2020"
+      ]
     }
   }
 }
