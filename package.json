@@ -5,7 +5,7 @@
   "main": "./dist/simple-drawing-board.js",
   "types": "./index.d.ts",
   "scripts": {
-    "test": "karma start",
+    "test": "karma start && tsd",
     "test:watch": "karma start --no-single-run --auto-watch --no-browsers",
     "lint": "eslint ./src/**/*",
     "dev": "rollup -c --watch",
@@ -39,6 +39,12 @@
     "karma-rollup-preprocessor": "^7.0.5",
     "prettier": "^2.0.5",
     "rollup": "^2.7.6",
-    "rollup-plugin-terser": "^6.1.0"
+    "rollup-plugin-terser": "^6.1.0",
+    "tsd": "^0.11.0"
+  },
+  "tsd": {
+    "compilerOptions": {
+      "lib": ["dom", "es2020"]
+    }
   }
 }

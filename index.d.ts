@@ -4,7 +4,12 @@ declare class Eve {
   trigger(ev: string, payload: any): void;
 }
 
-interface FillImageOptions = {
+interface ToDataURLOptions {
+  type?: string;
+  quality?: number;
+}
+
+interface FillImageOptions {
   isOverlay?: boolean;
 }
 
@@ -17,7 +22,7 @@ declare class SimpleDrawingBoard {
   fill(color: string): void;
   clear(): void;
   toggleMode(): void;
-  toDataURL(): string;
+  toDataURL(options?: ToDataURLOptions): string;
   fillImageByElement($el: CanvasImageSource, options?: FillImageOptions): void;
   fillImageByDataURL(src: string, options?: FillImageOptions): Promise<void>;
   undo(): Promise<void>;
