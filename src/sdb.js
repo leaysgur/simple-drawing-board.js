@@ -83,25 +83,27 @@ export class SimpleDrawingBoard {
     return this._ctx.canvas.toDataURL(type, quality);
   }
 
-  fillImageByElement($el) {
+  fillImageByElement($el, { isOverlay = false } = {}) {
     if (!isDrawableElement($el))
       throw new TypeError("Passed element is not a drawable!");
 
     const ctx = this._ctx;
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    // if isOverlay is true, do not clear current canvas
+    if (!isOverlay) ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage($el, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
     this._saveHistory();
   }
 
-  async fillImageByDataURL(src) {
+  async fillImageByDataURL(src, { isOverlay = false } = {}) {
     if (!isBase64DataURL(src))
       throw new TypeError("Passed src is not a base64 data URL!");
 
     const img = await loadImage(src);
 
     const ctx = this._ctx;
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    // if isOverlay is true, do not clear current canvas
+    if (!isOverlay) ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
     this._saveHistory();
