@@ -6,11 +6,9 @@ Just simple minimal canvas drawing lib.
 - Modern browser compatibility
 - Under 500 lines of code
 
-> For `v2.x` users
-> See https://github.com/leader22/simple-drawing-board.js/tree/v2.1.1
+> For `v2.x` users, See https://github.com/leader22/simple-drawing-board.js/tree/v2.1.1
 
-> For `v1.x` users
-> See https://github.com/leader22/simple-drawing-board.js/tree/v1.4.1
+> For `v1.x` users, See https://github.com/leader22/simple-drawing-board.js/tree/v1.4.1
 
 
 ## Install
@@ -87,12 +85,14 @@ sdb.toDataURL({ type: "image/jpeg", quality: 0.3 }); // compression quality
 ### fillImageByElement()
 ```js
 sdb.fillImageByElement(document.getElementById("img"));
+sdb.fillImageByElement(document.getElementById("img"), { isOverlay: true });
 ```
 
 
 ### async fillImageByDataURL()
 ```js
 await sdb.fillImageByDataURL("data:image/png;base64,xxxxxx....");
+await sdb.fillImageByDataURL("data:image/png;base64,xxxxxx....", { isOverlay: true });
 ```
 
 ### async undo()
@@ -106,6 +106,9 @@ await sdb.redo();
 ```
 
 ### destroy()
+
+Just detach from `canvas` element.
+
 ```js
 sdb.destroy();
 ```
