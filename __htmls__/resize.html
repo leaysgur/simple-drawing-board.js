@@ -14,8 +14,8 @@
     <button onclick="sdb.fillImageByElement(window.i)">fillImg</button>
   </div>
   <div>
-    <button onclick="scaleUp()">scale up</button>
-    <button onclick="scaleDown()">scale down</button>
+    <button onclick="scaleUpByContext()">scaleup(context)</button>
+    <button onclick="scaleUpByStyle()">scaleup(style)</button>
   </div>
 
   <script src="../../dist/simple-drawing-board.js"></script>
@@ -29,15 +29,13 @@
       window.sdb.setLineColor("tomato");
     };
 
-    window.scaleUp = async () => {
+    window.scaleUpByContext = async () => {
       const url = sdb.toDataURL();
       c.width = c.height = 750;
       await sdb.fillImageByDataURL(url);
     };
-    window.scaleDown = async () => {
-      const url = sdb.toDataURL();
-      c.width = c.height = 250;
-      await sdb.fillImageByDataURL(url);
+    window.scaleUpByStyle = async () => {
+      c.style.width = c.style.height = "750px";
     };
   </script>
 </body>
