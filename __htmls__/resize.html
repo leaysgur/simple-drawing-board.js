@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>SimpleDrawingBoard TEST</title>
+</head>
+<body>
+  <p>It should work w/ dynamic resizing</p>
+  <canvas id="c" style="border: 1px solid #000" width="500" height="500"></canvas>
+  <img id="i" src="./assets/image.png" style="display: none">
+  <div>
+    <button onclick="changeColorSize()">changeColor+Size</button>
+    <button onclick="sdb.fillImageByElement(window.i)">fillImg</button>
+  </div>
+  <div>
+    <button onclick="scaleUp()">scale up</button>
+    <button onclick="scaleDown()">scale down</button>
+  </div>
+
+  <script src="../../dist/simple-drawing-board.js"></script>
+  <script>
+    const { create } = window.SimpleDrawingBoard;
+    const c = document.getElementById("c");
+    window.sdb = create(c);
+
+    window.changeColorSize = () => {
+      window.sdb.setLineSize(10);
+      window.sdb.setLineColor("tomato");
+    };
+
+    window.scaleUp = async () => {
+      const url = sdb.toDataURL();
+      c.width = c.height = 750;
+      await sdb.fillImageByDataURL(url);
+    };
+    window.scaleDown = async () => {
+      const url = sdb.toDataURL();
+      c.width = c.height = 250;
+      await sdb.fillImageByDataURL(url);
+    };
+  </script>
+</body>
+</html>
+
