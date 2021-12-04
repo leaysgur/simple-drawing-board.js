@@ -12,7 +12,9 @@
   <div>
     <button onclick="sdb.destroy()">destroy</button>
     <button onclick="sdb.clear()">clear</button>
-    <button onclick="sdb.toggleMode()">toggleMode</button>
+    <button onclick="sdb.toggleMode('DRAW')">toggleMode draw</button>
+    <button onclick="sdb.toggleMode('ERASE')">toggleMode erase</button>
+    <button onclick="sdb.toggleMode('FLOOD')">toggleMode flood</button>
     /
     <button onclick="sdb.undo()">undo</button>
     <button onclick="sdb.redo()">redo</button>
@@ -29,6 +31,8 @@
     /
     <button onclick="sdb.fillImageByElement(window.i)">fillImg</button>
     <button onclick="sdb.fillImageByElement(window.i, { isOverlay: true })">fillImg(overlay)</button>
+    /
+    <button onclick="sdb.flood()">flood</button>
   </div>
 
   <script src="../dist/simple-drawing-board.js"></script>
@@ -36,7 +40,9 @@
     const { create } = window.SimpleDrawingBoard;
     const c = document.getElementById("c");
     window.sdb = create(c);
-    window.sdb.observer.on("drawBegin", () => console.log("begin"));
+    window.sdb.observer.on("drawBegin", () => console.log("begin draw"));
+    window.sdb.observer.on("eraseBegin", () => console.log("begin erase"));
+    window.sdb.observer.on("floodBegin", () => console.log("begin flood"));
     window.sdb.observer.on("draw", () => console.log("drawing"));
     window.sdb.observer.on("drawEnd", () => console.log("end"));
     window.sdb.observer.on("save", () => console.log("save"));

@@ -16,7 +16,7 @@ interface FillImageOptions {
 declare class SimpleDrawingBoard {
   get observer(): Eve;
   get canvas(): HTMLCanvasElement;
-  get mode(): "draw" | "erase"
+  get mode(): "draw" | "erase" | "flood"
   setLineSize(size: number): void;
   setLineColor(color: string): void;
   fill(color: string): void;

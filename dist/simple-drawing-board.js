@@ -2,7 +2,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.SimpleDrawingBoard = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
   /**
    *
@@ -173,6 +173,12 @@
     };
   }
 
+  const Mode = {
+    DRAW: 'draw',
+    ERASE: 'erase',
+    FLOOD: 'flood'
+  };
+
   class SimpleDrawingBoard {
     constructor($el) {
       this._$el = $el;
@@ -182,7 +188,8 @@
       this._ctx.lineCap = this._ctx.lineJoin = "round";
 
       // for canvas operation
-      this._isDrawMode = true;
+      this._drawMode = Mode.DRAW;
+      this._isFlooding = false;
 
       // for drawing
       this._isDrawing = false;
@@ -192,6 +199,8 @@
         oldMid: { x: 0, y: 0 },
         current: { x: 0, y: 0 },
       };
+
+      this._imageData = undefined;
 
       this._ev = new Eve();
       this._history = new History(this.toDataURL());
@@ -209,7 +218,7 @@
     }
 
     get mode() {
-      return this._isDrawMode ? "draw" : "erase";
+      return this._drawMode;
     }
 
     setLineSize(size) {
@@ -218,6 +227,7 @@
 
     setLineColor(color) {
       this._ctx.strokeStyle = color;
+      console.log(color);
     }
 
     fill(color) {
@@ -236,11 +246,27 @@
       this._saveHistory();
     }
 
-    toggleMode() {
-      this._ctx.globalCompositeOperation = this._isDrawMode
-        ? "destination-out"
-        : "source-over";
-      this._isDrawMode = !this._isDrawMode;
+    // DRAW / ERASE / FLOOD
+    toggleMode(mode) {
+      if(! (mode == "DRAW" || mode == "ERASE" || mode == "FLOOD")){
+        console.log("Error: Invalid drawing mode");
+        return;
+      }
+
+      switch(mode){
+        case "DRAW":
+          this._ctx.globalCompositeOperation = "source-over";
+          this._drawMode = Mode.DRAW;  
+        break;
+        case "ERASE":
+          this._ctx.globalCompositeOperation = "destination-out";
+          this._drawMode = Mode.ERASE;  
+          break;
+        case "FLOOD":
+          this._ctx.globalCompositeOperation = "source-over";
+          this._drawMode = Mode.FLOOD;  
+          break;
+      }    
     }
 
     toDataURL({ type, quality } = {}) {
@@ -356,6 +382,14 @@
 
       if (!this._isDrawing) return;
 
+      if (this._drawMode == Mode.DRAW || this._drawMode == Mode.ERASE){
+        this._drawWithPen();
+      }else if (this._drawMode == Mode.FLOOD){
+        this._drawFlood();
+      }
+    }
+
+    _drawWithPen(){
       const isSameCoords =
         this._coords.old.x === this._coords.current.x &&
         this._coords.old.y === this._coords.current.y;
@@ -382,6 +416,111 @@
       if (!isSameCoords) this._ev.trigger("draw", this._coords.current);
     }
 
+    _drawFlood(){
+      if(this._isFlooding){
+        return;
+      }
+
+      this._isFlooding = true;
+
+      const startX = Math.floor(this._coords.current.x);
+      const startY = Math.floor(this._coords.current.y);
+
+      const canvasWidth = this._ctx.canvas.width;
+      const canvasHeight = this._ctx.canvas.height;
+
+
+      this._imageData = this._ctx.getImageData(0,0,canvasWidth, canvasHeight);
+
+      let pixelStack = [[startX, startY]];
+
+      const startPos = (startY * canvasWidth + startX) * 4;
+      const targetColor = this._getTargetColor(startPos);
+
+      while(pixelStack.length)
+      {
+        var newPos, x, y, pixelPos, reachLeft, reachRight;
+        newPos = pixelStack.pop();
+        console.log("Boucle while: ", newPos);
+        x = newPos[0];
+        y = newPos[1];
+        
+        pixelPos = (y*canvasWidth + x) * 4;
+        console.log("Linear pos: ", pixelPos);
+        while(y-- >= 0 && this._matchStartColor(pixelPos, targetColor))
+        {
+          console.log("MatchStartColor");
+          pixelPos -= canvasWidth * 4;
+        }
+        pixelPos += canvasWidth * 4;
+        ++y;
+        reachLeft = false;
+        reachRight = false;
+        while(y++ < canvasHeight-1 && this._matchStartColor(pixelPos, targetColor))
+        {
+          this._colorPixel(pixelPos);
+
+          if(x > 0)
+          {
+            if(this._matchStartColor(pixelPos - 4, targetColor))
+            {
+              if(!reachLeft){
+                pixelStack.push([x - 1, y]);
+                reachLeft = true;
+              }
+            }
+            else if(reachLeft)
+            {
+              reachLeft = false;
+            }
+          }
+        
+          if(x < canvasWidth-1)
+          {
+            if(this._matchStartColor(pixelPos + 4, targetColor))
+            {
+              if(!reachRight)
+              {
+                pixelStack.push([x + 1, y]);
+                reachRight = true;
+              }
+            }
+            else if(reachRight)
+            {
+              reachRight = false;
+            }
+          }
+            
+          pixelPos += canvasWidth * 4;
+        }
+      }
+      this._isFlooding = false;
+      this._ctx.putImageData(this._imageData, 0, 0);
+    }
+
+  _matchStartColor(pixelPos, targetColor){
+    var r = this._imageData.data[pixelPos];	
+    var g = this._imageData.data[pixelPos+1];	
+    var b = this._imageData.data[pixelPos+2];
+
+    return (r == targetColor[0] && g == targetColor[1] && b == targetColor[2]);
+  }
+
+  _getTargetColor(pixelPos){
+    var r = this._imageData.data[pixelPos];	
+    var g = this._imageData.data[pixelPos+1];	
+    var b = this._imageData.data[pixelPos+2];
+
+    return [r,g,b];
+  }
+
+  _colorPixel(pixelPos){
+    this._imageData.data[pixelPos] = 255;
+    this._imageData.data[pixelPos+1] = 0;
+    this._imageData.data[pixelPos+2] = 0;
+    this._imageData.data[pixelPos+3] = 255;
+  }
+
     _onInputDown(ev) {
       this._isDrawing = true;
 
@@ -389,7 +528,17 @@
       this._coords.current = this._coords.old = coords;
       this._coords.oldMid = getMidInputCoords(this._coords.old, coords);
 
-      this._ev.trigger("drawBegin", this._coords.current);
+      switch(this._drawMode){
+        case Mode.DRAW:
+          this._ev.trigger("drawBegin", this._coords.current);
+          break;
+        case Mode.ERASE:
+          this._ev.trigger("eraseBegin", this._coords.current);
+          break;
+        case Mode.FLOOD:
+          this._ev.trigger("floodBegin", this._coords.current);
+          break;
+      }
     }
 
     _onInputMove(ev) {
@@ -430,4 +579,4 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
