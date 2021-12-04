@@ -1,4 +1,4 @@
-# simple-drawing-board.js
+# simple-drawing-board.js fork to add flood function
 
 Just simple minimal canvas drawing lib.
 
