@@ -227,7 +227,6 @@
 
     setLineColor(color) {
       this._ctx.strokeStyle = color;
-      console.log(color);
     }
 
     fill(color) {
@@ -437,19 +436,18 @@
       const startPos = (startY * canvasWidth + startX) * 4;
       const targetColor = this._getTargetColor(startPos);
 
-      while(pixelStack.length)
+      while(pixelStack.length > 0)
       {
+        console.log("while", pixelStack.length);
         var newPos, x, y, pixelPos, reachLeft, reachRight;
         newPos = pixelStack.pop();
-        console.log("Boucle while: ", newPos);
         x = newPos[0];
         y = newPos[1];
+        console.log("new pos:", newPos);
         
         pixelPos = (y*canvasWidth + x) * 4;
-        console.log("Linear pos: ", pixelPos);
         while(y-- >= 0 && this._matchStartColor(pixelPos, targetColor))
         {
-          console.log("MatchStartColor");
           pixelPos -= canvasWidth * 4;
         }
         pixelPos += canvasWidth * 4;
@@ -460,7 +458,7 @@
         {
           this._colorPixel(pixelPos);
 
-          if(x > 0)
+          if(x > 0 && y > 0 && x < canvasWidth - 1 && y <= canvasHeight - 1)
           {
             if(this._matchStartColor(pixelPos - 4, targetColor))
             {
@@ -475,7 +473,7 @@
             }
           }
         
-          if(x < canvasWidth-1)
+          if(x > 0 && y > 0 && x < canvasWidth - 1 && y <= canvasHeight - 1)
           {
             if(this._matchStartColor(pixelPos + 4, targetColor))
             {
