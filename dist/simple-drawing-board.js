@@ -433,16 +433,24 @@
       let pixelStack = [[startX, startY]];
 
       const startPos = (startY * canvasWidth + startX) * 4;
+
+      const fillColor = this._hexToRgbA(this._ctx.strokeStyle);
       const targetColor = this._getTargetColor(startPos);
+
+      console.log(fillColor);
+      console.log(targetColor);
+
+      if(fillColor[0] == targetColor[0] && fillColor[1] == targetColor[1] && fillColor[2] == targetColor[2]){
+        this._isFlooding = false;
+        return;
+      }
 
       while(pixelStack.length > 0)
       {
-        console.log("while", pixelStack.length);
         var newPos, x, y, pixelPos, reachLeft, reachRight;
         newPos = pixelStack.pop();
         x = newPos[0];
         y = newPos[1];
-        console.log("new pos:", newPos);
 
         pixelPos = (y*canvasWidth + x) * 4;
         while(y-- >= 0 && this._matchStartColor(pixelPos, targetColor))
@@ -455,7 +463,7 @@
         reachRight = false;
         while(y++ < canvasHeight-1 && this._matchStartColor(pixelPos, targetColor))
         {
-          this._colorPixel(pixelPos);
+          this._colorPixel(pixelPos, fillColor);
 
           if(x > 0 && y > 0 && x < canvasWidth - 1 && y <= canvasHeight - 1)
           {
@@ -500,12 +508,21 @@
       var g = this._imageData.data[pixelPos+1];	
       var b = this._imageData.data[pixelPos+2];
 
-      if(r == targetColor[0] && g == targetColor[1] && b == targetColor[2]){
-        console.log("match color pos : ", pixelPos, " : ",r ,", ", g, ", ", b ," == " , targetColor);
-      }
-
       return (r == targetColor[0] && g == targetColor[1] && b == targetColor[2]);
     }
+
+    _hexToRgbA(hex){
+      var c;
+      if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+          c= hex.substring(1).split('');
+          if(c.length== 3){
+              c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+          }
+          c= '0x'+c.join('');
+          return [(c>>16)&255, (c>>8)&255, c&255];
+      }
+      throw new Error('Bad Hex');
+  }
 
     _getTargetColor(pixelPos){
       var r = this._imageData.data[pixelPos];	
@@ -515,10 +532,10 @@
       return [r,g,b];
     }
 
-    _colorPixel(pixelPos){
-      this._imageData.data[pixelPos] = 255;
-      this._imageData.data[pixelPos+1] = 0;
-      this._imageData.data[pixelPos+2] = 0;
+    _colorPixel(pixelPos, fillColor){
+      this._imageData.data[pixelPos] = fillColor[0];
+      this._imageData.data[pixelPos+1] = fillColor[1];
+      this._imageData.data[pixelPos+2] = fillColor[2];
       this._imageData.data[pixelPos+3] = 255;
     }
 
