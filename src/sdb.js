@@ -41,6 +41,7 @@ export class SimpleDrawingBoard {
     this._ev = new Eve();
     this._history = new History(this.toDataURL());
 
+    this.fill("#ffffff")
     this._bindEvents();
     this._drawFrame();
   }
@@ -220,8 +221,6 @@ export class SimpleDrawingBoard {
 
     if (this._drawMode == Mode.DRAW || this._drawMode == Mode.ERASE){
       this._drawWithPen();
-    }else if (this._drawMode == Mode.FLOOD){
-      this._drawFlood();
     }
   }
 
@@ -275,13 +274,11 @@ export class SimpleDrawingBoard {
 
     while(pixelStack.length > 0)
     {
-      console.log("while", pixelStack.length);
       var newPos, x, y, pixelPos, reachLeft, reachRight;
       newPos = pixelStack.pop();
       x = newPos[0];
       y = newPos[1];
-      console.log("new pos:", newPos);
-      
+
       pixelPos = (y*canvasWidth + x) * 4;
       while(y-- >= 0 && this._matchStartColor(pixelPos, targetColor))
       {
@@ -333,28 +330,28 @@ export class SimpleDrawingBoard {
     this._ctx.putImageData(this._imageData, 0, 0);
   }
 
-_matchStartColor(pixelPos, targetColor){
-  var r = this._imageData.data[pixelPos];	
-  var g = this._imageData.data[pixelPos+1];	
-  var b = this._imageData.data[pixelPos+2];
+  _matchStartColor(pixelPos, targetColor){
+    var r = this._imageData.data[pixelPos];	
+    var g = this._imageData.data[pixelPos+1];	
+    var b = this._imageData.data[pixelPos+2];
 
-  return (r == targetColor[0] && g == targetColor[1] && b == targetColor[2]);
-}
+    return (r == targetColor[0] && g == targetColor[1] && b == targetColor[2]);
+  }
 
-_getTargetColor(pixelPos){
-  var r = this._imageData.data[pixelPos];	
-  var g = this._imageData.data[pixelPos+1];	
-  var b = this._imageData.data[pixelPos+2];
+  _getTargetColor(pixelPos){
+    var r = this._imageData.data[pixelPos];	
+    var g = this._imageData.data[pixelPos+1];	
+    var b = this._imageData.data[pixelPos+2];
 
-  return [r,g,b];
-}
+    return [r,g,b];
+  }
 
-_colorPixel(pixelPos){
-  this._imageData.data[pixelPos] = 255;
-  this._imageData.data[pixelPos+1] = 0;
-  this._imageData.data[pixelPos+2] = 0;
-  this._imageData.data[pixelPos+3] = 255;
-}
+  _colorPixel(pixelPos){
+    this._imageData.data[pixelPos] = 255;
+    this._imageData.data[pixelPos+1] = 0;
+    this._imageData.data[pixelPos+2] = 0;
+    this._imageData.data[pixelPos+3] = 255;
+  }
 
   _onInputDown(ev) {
     this._isDrawing = true;
@@ -372,6 +369,7 @@ _colorPixel(pixelPos){
         break;
       case Mode.FLOOD:
         this._ev.trigger("floodBegin", this._coords.current);
+        this._drawFlood();
         break;
     }
   }
