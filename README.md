@@ -1,5 +1,9 @@
 # simple-drawing-board.js fork to add flood function
 
+Original project : https://github.com/leader22/simple-drawing-board.js
+
+I only added a flood function for personal usage.
+
 Just simple minimal canvas drawing lib.
 
 - 0 dependencies
@@ -67,12 +71,16 @@ sdb.fill("orange");
 sdb.clear();
 ```
 
-### toggleMode()
+### toggleMode( mode )
 ```js
-// switch DRAW <=> ERASE
+// switch DRAW <=> ERASE <=> FLOOD
 sdb.mode; // "draw"
-sdb.toggleMode();
+sdb.toggleMode('ERASE');
 sdb.mode; // "erase"
+sdb.toggleMode('FLOOD');
+sdb.mode; // "flood"
+sdb.toggleMode('DRAW');
+sdb.mode; // "draw"
 ```
 
 ### toDataURL()
