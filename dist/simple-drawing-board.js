@@ -249,8 +249,7 @@
     // DRAW / ERASE / FLOOD
     toggleMode(mode) {
       if(! (mode == "DRAW" || mode == "ERASE" || mode == "FLOOD")){
-        console.log("Error: Invalid drawing mode");
-        return;
+        throw "Error: Invalid drawing mode. Available drawing modes are DRAW, ERASE and FLOOD.";
       }
 
       switch(mode){
@@ -437,9 +436,6 @@
       const fillColor = this._hexToRgbA(this._ctx.strokeStyle);
       const targetColor = this._getTargetColor(startPos);
 
-      console.log(fillColor);
-      console.log(targetColor);
-
       if(fillColor[0] == targetColor[0] && fillColor[1] == targetColor[1] && fillColor[2] == targetColor[2]){
         this._isFlooding = false;
         return;
@@ -546,17 +542,10 @@
       this._coords.current = this._coords.old = coords;
       this._coords.oldMid = getMidInputCoords(this._coords.old, coords);
 
-      switch(this._drawMode){
-        case Mode.DRAW:
-          this._ev.trigger("drawBegin", this._coords.current);
-          break;
-        case Mode.ERASE:
-          this._ev.trigger("eraseBegin", this._coords.current);
-          break;
-        case Mode.FLOOD:
-          this._ev.trigger("floodBegin", this._coords.current);
-          this._drawFlood();
-          break;
+      this._ev.trigger("drawBegin", this._coords.current);
+
+      if(this._drawMode == Mode.FLOOD){
+        this._drawFlood();
       }
     }
 

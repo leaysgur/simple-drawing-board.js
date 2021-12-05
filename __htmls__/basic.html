@@ -41,8 +41,6 @@
     const c = document.getElementById("c");
     window.sdb = create(c);
     window.sdb.observer.on("drawBegin", () => console.log("begin draw"));
-    window.sdb.observer.on("eraseBegin", () => console.log("begin erase"));
-    window.sdb.observer.on("floodBegin", () => console.log("begin flood"));
     window.sdb.observer.on("draw", () => console.log("drawing"));
     window.sdb.observer.on("drawEnd", () => console.log("end"));
     window.sdb.observer.on("save", () => console.log("save"));
