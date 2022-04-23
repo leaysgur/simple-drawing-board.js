@@ -143,6 +143,10 @@ export class SimpleDrawingBoard {
     this._timer = null;
   }
 
+  clearHistory() {
+    this._history.clear();
+  }
+
   handleEvent(ev) {
     ev.preventDefault();
     ev.stopPropagation();
