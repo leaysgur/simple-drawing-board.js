@@ -141,6 +141,20 @@ describe("sdb#destroy()", () => {
   });
 });
 
+describe("sdb#clearHistory()", () => {
+  it("should not change by undo after clearHistory", () => {
+    sdb.fill("orange");
+    const url1 = sdb.toDataURL();
+
+    sdb.clearHistory();
+    sdb.undo();
+
+    const url2 = sdb.toDataURL();
+
+    expect(url1).toBe(url2);
+  });
+});
+
 describe("sdb#observer", () => {
   it("should expose", (done) => {
     sdb.observer.on("save", done);
