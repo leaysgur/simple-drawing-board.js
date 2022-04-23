@@ -3,6 +3,11 @@ export function isTouch() {
 }
 
 // expect HTML elements from CanvasImageSource
+/**
+ *
+ * @param $el {HTMLCanvasElement}
+ * @returns {boolean}
+ */
 export function isDrawableElement($el) {
   if ($el instanceof HTMLImageElement) return true;
   if ($el instanceof SVGImageElement) return true;
@@ -11,12 +16,22 @@ export function isDrawableElement($el) {
   return false;
 }
 
+/**
+ *
+ * @param url {string}
+ * @returns {boolean}
+ */
 export function isBase64DataURL(url) {
   if (typeof url !== "string") return false;
   if (!url.startsWith("data:image/")) return false;
   return true;
 }
 
+/**
+ *
+ * @param src {string}
+ * @returns {Promise<HTMLImageElement>}
+ */
 export async function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -26,6 +41,12 @@ export async function loadImage(src) {
   });
 }
 
+/**
+ *
+ * @param old {{x: number, y: number}}
+ * @param coords {{x: number, y: number}}
+ * @returns {{x: number, y: number}}
+ */
 export function getMidInputCoords(old, coords) {
   return {
     x: (old.x + coords.x) >> 1,
@@ -33,6 +54,12 @@ export function getMidInputCoords(old, coords) {
   };
 }
 
+/**
+ *
+ * @param ev {Event}
+ * @param $el {HTMLCanvasElement}
+ * @returns {{x: number, y: number}}
+ */
 export function getInputCoords(ev, $el) {
   let x, y;
   if (isTouch()) {

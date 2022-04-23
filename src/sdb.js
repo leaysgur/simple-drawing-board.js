@@ -9,53 +9,113 @@ import {
   getInputCoords,
 } from "./utils/dom";
 
+/**
+ * @typedef {{ isOverlay?: boolean }} FillImageOptions
+ */
+
 export class SimpleDrawingBoard {
+  /**
+   * @param $el {HTMLCanvasElement}
+   */
   constructor($el) {
+    /**
+     * @type {HTMLCanvasElement}
+     * @private
+     */
     this._$el = $el;
+    /**
+     * @type {CanvasRenderingContext2D}
+     * @private
+     */
     this._ctx = this._$el.getContext("2d");
 
     // handwriting fashion ;D
+    /**
+     * @type {string}
+     */
     this._ctx.lineCap = this._ctx.lineJoin = "round";
 
     // for canvas operation
+    /**
+     * @type {boolean}
+     * @private
+     */
     this._isDrawMode = true;
 
     // for drawing
+    /**
+     * @type {boolean}
+     * @private
+     */
     this._isDrawing = false;
+    /**
+     * @type {null | number}
+     * @private
+     */
     this._timer = null;
+    /**
+     * @type {{current: {x: number, y: number}, old: {x: number, y: number}, oldMid: {x: number, y: number}}}
+     * @private
+     */
     this._coords = {
       old: { x: 0, y: 0 },
       oldMid: { x: 0, y: 0 },
       current: { x: 0, y: 0 },
     };
 
+    /**
+     * @type {Eve}
+     * @private
+     */
     this._ev = new Eve();
+    /**
+     * @type {History}
+     * @private
+     */
     this._history = new History(this.toDataURL());
 
     this._bindEvents();
     this._drawFrame();
   }
 
+  /**
+   * @returns {HTMLCanvasElement}
+   */
   get canvas() {
     return this._$el;
   }
 
+  /**
+   * @returns {Eve}
+   */
   get observer() {
     return this._ev;
   }
 
+  /**
+   * @returns {"draw" | "erase"}
+   */
   get mode() {
     return this._isDrawMode ? "draw" : "erase";
   }
 
+  /**
+   * @param size {number}
+   */
   setLineSize(size) {
     this._ctx.lineWidth = size | 0 || 1;
   }
 
+  /**
+   * @param color {string}
+   */
   setLineColor(color) {
     this._ctx.strokeStyle = color;
   }
 
+  /**
+   * @param color {string}
+   */
   fill(color) {
     const ctx = this._ctx;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -79,10 +139,20 @@ export class SimpleDrawingBoard {
     this._isDrawMode = !this._isDrawMode;
   }
 
+  /**
+   * @typedef {{type?: string, quality?: number}} ToDataUrlOptions
+   * @param option {ToDataUrlOptions}
+   * @returns {string}
+   */
   toDataURL({ type, quality } = {}) {
     return this._ctx.canvas.toDataURL(type, quality);
   }
 
+  /**
+   *
+   * @param $el {HTMLCanvasElement}
+   * @param option {FillImageOptions}
+   */
   fillImageByElement($el, { isOverlay = false } = {}) {
     if (!isDrawableElement($el))
       throw new TypeError("Passed element is not a drawable!");
@@ -95,6 +165,12 @@ export class SimpleDrawingBoard {
     this._saveHistory();
   }
 
+  /**
+   *
+   * @param src {string}
+   * @param option {FillImageOptions}
+   * @returns {Promise<void>}
+   */
   async fillImageByDataURL(src, { isOverlay = false } = {}) {
     if (!isBase64DataURL(src))
       throw new TypeError("Passed src is not a base64 data URL!");
@@ -143,6 +219,10 @@ export class SimpleDrawingBoard {
     this._timer = null;
   }
 
+  /**
+   *
+   * @param ev {Event}
+   */
   handleEvent(ev) {
     ev.preventDefault();
     ev.stopPropagation();
@@ -219,6 +299,11 @@ export class SimpleDrawingBoard {
     if (!isSameCoords) this._ev.trigger("draw", this._coords.current);
   }
 
+  /**
+   *
+   * @param ev {Event}
+   * @private
+   */
   _onInputDown(ev) {
     this._isDrawing = true;
 
@@ -229,6 +314,11 @@ export class SimpleDrawingBoard {
     this._ev.trigger("drawBegin", this._coords.current);
   }
 
+  /**
+   *
+   * @param ev {Event}
+   * @private
+   */
   _onInputMove(ev) {
     this._coords.current = getInputCoords(ev, this._$el);
   }

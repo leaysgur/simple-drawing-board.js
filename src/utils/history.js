@@ -5,12 +5,30 @@
  *
  */
 export class History {
+  /**
+   *
+   * @param [initialValue] {string}
+   */
   constructor(initialValue = null) {
+    /**
+     *
+     * @type {string[]}
+     * @private
+     */
     this._past = [];
     this._present = initialValue;
+    /**
+     *
+     * @type {string[]}
+     * @private
+     */
     this._future = [];
   }
 
+  /**
+   *
+   * @returns {string | null}
+   */
   get value() {
     return this._present;
   }
@@ -31,6 +49,9 @@ export class History {
     this._present = next;
   }
 
+  /**
+   * @param newPresent {string}
+   */
   save(newPresent) {
     if (this._present === newPresent) return;
 
