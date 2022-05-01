@@ -134,7 +134,7 @@ describe("sdb#undo() + redo()", () => {
 
 describe("sdb#destroy()", () => {
   it("should not emit event anymore", (done) => {
-    sdb.observer.on("save", done.fail);
+    sdb.observer.on("save", () => done.fail());
     sdb.destroy();
     sdb.fill("green");
     done();
@@ -143,7 +143,7 @@ describe("sdb#destroy()", () => {
 
 describe("sdb#observer", () => {
   it("should expose", (done) => {
-    sdb.observer.on("save", done);
+    sdb.observer.on("save", () => done());
     sdb.fill("green");
   });
 });
