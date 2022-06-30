@@ -28,19 +28,19 @@
   },
   "homepage": "https://github.com/leader22/simple-drawing-board.js",
   "devDependencies": {
-    "eslint": "^8.16.0",
+    "eslint": "^8.18.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jasmine": "^4.1.0",
-    "karma": "^6.3.20",
+    "eslint-plugin-prettier": "^4.2.0",
+    "jasmine": "^4.2.1",
+    "karma": "^6.4.0",
     "karma-chrome-launcher": "^3.1.1",
-    "karma-jasmine": "^5.0.1",
+    "karma-jasmine": "^5.1.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-rollup-preprocessor": "^7.0.8",
-    "prettier": "^2.6.2",
-    "rollup": "^2.75.4",
+    "prettier": "^2.7.1",
+    "rollup": "^2.75.7",
     "rollup-plugin-terser": "^7.0.2",
-    "tsd": "^0.20.0"
+    "tsd": "^0.21.0"
   },
   "tsd": {
     "compilerOptions": {
