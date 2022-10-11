@@ -428,6 +428,4 @@
 
   exports.create = create;
 
-  Object.defineProperty(exports, '__esModule', { value: true });
-
 }));
