@@ -7,7 +7,7 @@
   "scripts": {
     "test": "karma start && tsd",
     "test:watch": "karma start --no-single-run --auto-watch --no-browsers",
-    "lint": "eslint ./src/**/*",
+    "lint": "eslint ./src/**/* && prettier ./src -w",
     "dev": "rollup -c --watch",
     "build": "rollup -c"
   },
@@ -29,8 +29,6 @@
   "homepage": "https://github.com/leader22/simple-drawing-board.js",
   "devDependencies": {
     "eslint": "^8.44.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "jasmine": "^5.0.2",
     "karma": "^6.4.2",
     "karma-chrome-launcher": "^3.2.0",
