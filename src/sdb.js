@@ -199,7 +199,7 @@ export class SimpleDrawingBoard {
 
     const currentMid = getMidInputCoords(
       this._coords.old,
-      this._coords.current
+      this._coords.current,
     );
     const ctx = this._ctx;
 
@@ -209,7 +209,7 @@ export class SimpleDrawingBoard {
       this._coords.old.x,
       this._coords.old.y,
       this._coords.oldMid.x,
-      this._coords.oldMid.y
+      this._coords.oldMid.y,
     );
     ctx.stroke();
 
