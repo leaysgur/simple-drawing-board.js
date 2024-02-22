@@ -150,7 +150,9 @@ export class SimpleDrawingBoard {
     switch (ev.type) {
       case "mousedown":
       case "touchstart":
-        this._onInputDown(ev);
+        if (ev.button === 0) {
+          this._onInputDown(ev);
+        }
         break;
       case "mousemove":
       case "touchmove":
