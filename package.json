@@ -28,13 +28,13 @@
   },
   "homepage": "https://github.com/leader22/simple-drawing-board.js",
   "devDependencies": {
-    "jasmine": "^5.1.0",
-    "karma": "^6.4.3",
+    "jasmine": "^5.2.0",
+    "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-jasmine": "^5.1.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-rollup-preprocessor": "^7.0.8",
-    "rollup": "^4.18.0",
+    "rollup": "^4.19.2",
     "rollup-plugin-terser": "^7.0.2",
     "tsd": "^0.31.1"
   },
