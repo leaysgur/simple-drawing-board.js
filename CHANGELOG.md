@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v3.1.3
+
+- Update author username
+
 ## v3.1.2
 
 - Update deps
