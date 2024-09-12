@@ -1,7 +1,7 @@
 /**
  *
  * Minimul EventEmitter implementation
- * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
+ * See `https://gist.github.com/leaysgur/3ab8416ce41883ae1ccd`
  *
  */
 export class Eve {

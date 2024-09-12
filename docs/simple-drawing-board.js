@@ -7,7 +7,7 @@
   /**
    *
    * Minimul EventEmitter implementation
-   * See `https://gist.github.com/leader22/3ab8416ce41883ae1ccd`
+   * See `https://gist.github.com/leaysgur/3ab8416ce41883ae1ccd`
    *
    */
   class Eve {
@@ -63,7 +63,7 @@
   /**
    *
    * History for undo/redo Structure(mutable)
-   * See `https://gist.github.com/leader22/9fbed07106d652ef40fda702da4f39c4`
+   * See `https://gist.github.com/leaysgur/9fbed07106d652ef40fda702da4f39c4`
    *
    */
   class History {

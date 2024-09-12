@@ -1,7 +1,7 @@
 /**
  *
  * History for undo/redo Structure(mutable)
- * See `https://gist.github.com/leader22/9fbed07106d652ef40fda702da4f39c4`
+ * See `https://gist.github.com/leaysgur/9fbed07106d652ef40fda702da4f39c4`
  *
  */
 export class History {

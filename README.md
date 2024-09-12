@@ -6,9 +6,9 @@ Just simple minimal canvas drawing lib.
 - Modern browser compatibility
 - Under 500 lines of code
 
-> For `v2.x` users, See https://github.com/leader22/simple-drawing-board.js/tree/v2.1.1
+> For `v2.x` users, See https://github.com/leaysgur/simple-drawing-board.js/tree/v2.1.1
 
-> For `v1.x` users, See https://github.com/leader22/simple-drawing-board.js/tree/v1.4.1
+> For `v1.x` users, See https://github.com/leaysgur/simple-drawing-board.js/tree/v1.4.1
 
 
 ## Install
@@ -147,7 +147,7 @@ sdb.observer.on("save", (curImg) => {
 
 ## Alternatives
 - [Fabric.js](https://github.com/kangax/fabric.js): More and more functions and utils.
-- [drawingboard.js](https://github.com/Leimi/drawingboard.js): With jQuery.
+- [drawingboard.js](https://github.com/Leimi/drawingboard.js): Need jQuery.
 
 ## License
 MIT
